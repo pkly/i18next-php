@@ -124,7 +124,12 @@ function setPath(&$object, $path, $newValue) {
 function pushPath(&$object, $path, $newValue, bool $concat) {
     $res = getLastOfPath($object, $path, []);
 
-    // $res['obj'][$res['k']];
+    $res['obj'][$res['k']] = $res['obj'][$res['k']] ?? [];
+
+    if ($concat)
+        $res['obj'][$res['k']] = array_merge($res['obj'][$res['k']], $newValue);
+    else
+        $res['obj'][$res['k']][] = $newValue;
 }
 
 function getPath(&$object, $path) {
