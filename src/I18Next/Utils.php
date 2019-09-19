@@ -81,3 +81,57 @@ function transformOptions(?array $options = null) {
 }
 
 function noop(...$args) {}
+
+function getLastOfPath(&$object, $path, $Empty = null) {
+    $cleanKey = function ($key) {
+        return $key && mb_strpos($key, '###') !== false ? str_replace('###', '.', $key) : $key;
+    };
+
+    $obj = &$object;
+
+    $canNotTraverseDeeper = function () use ($obj) {
+        return $obj === null || is_string($obj);
+    };
+
+    $stack = is_array($path) ? $path : explode('.', $path);
+    while (count($stack) > 1) {
+        if ($canNotTraverseDeeper())
+            return [];
+
+        $key = $cleanKey(array_shift($stack));
+        if (!isset($obj[$key]) && $Empty !== null) {
+            $obj[$key] = $Empty;
+        }
+
+        $obj = &$obj[$key];
+    }
+
+    if ($canNotTraverseDeeper())
+        return [];
+
+    return [
+        'obj'       =>  &$obj,
+        'k'         =>  $cleanKey(array_shift($stack))
+    ];
+}
+
+function setPath(&$object, $path, $newValue) {
+    $res = getLastOfPath($object, $path, []);
+
+    $res['obj'][$res['k']] = $newValue;
+}
+
+function pushPath(&$object, $path, $newValue, bool $concat) {
+    $res = getLastOfPath($object, $path, []);
+
+    // $res['obj'][$res['k']];
+}
+
+function getPath(&$object, $path) {
+    $res = getLastOfPath($object, $path);
+
+    if (!isset($res['obj']))
+        return null;
+
+    return $res['obj'][$res['k']];
+}

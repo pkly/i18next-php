@@ -10,33 +10,66 @@ namespace I18Next;
 
 
 class ResourceStore {
-    private $_storage                           =   [];
+    private $_data                              =   [];
+    private $_options                           =   [];
 
-    public function add(string $lang, string $namespace, array $resources = [], bool $deep = false, bool $overwrite = false) {
-        if (!is_array($this->_storage[$lang] ?? null))
-            $this->_storage[$lang] = [];
+    public function __construct(array $data = [], ?array $options = null) {
+        $this->_data = $data;
 
-        if (!is_array($this->_storage[$lang][$namespace] ?? null))
-            $this->_storage[$lang][$namespace] = [];
+        $defaults = Utils\getDefaults();
 
-        // TODO: differentiate between deep/overwrite
-        $this->_storage[$lang][$namespace] = $resources;
+        if ($options === null) {
+            $options = [
+                'ns'            =>  $defaults['ns'],
+                'defaultNS'     =>  $defaults['defaultNS']
+            ];
+        }
+
+        if (!isset($options['keySeparator'])) {
+            $options['keySeparator'] = $defaults['keySeparator'];
+        }
+
+        $this->_options = $options;
     }
 
-    public function has(string $lang, string $namespace): bool {
-        return is_array($this->_storage[$lang][$namespace] ?? null);
+    public function addNamespaces($namespaces) {
+        if (!is_array($namespaces))
+            $namespaces = [$namespaces];
+
+        foreach ($namespaces as $namespace)
+            if (!in_array($namespace, $this->_options['ns']))
+                $this->_options['ns'][] = $namespace;
     }
 
-    public function get(string $lang, string $namespace): ?array {
-        return $this->_storage[$lang][$namespace] ?? null;
+    public function removeNamespaces($namespaces) {
+        if (!is_array($namespaces))
+            $namespaces = [$namespaces];
+
+        foreach ($namespaces as $namespace) {
+            $key = array_search($namespace, $this->_options['ns']);
+            if ($key !== false)
+                unset($this->_options['ns'][$key]);
+        }
+
+        // Technically not required but otherwise the keys will be a mess when removing namespaces
+        $this->_options['ns'] = array_values($this->_options['ns']);
     }
 
-    public function remove(string $lang, string $namespace) {
-        if ($this->has($lang, $namespace))
-            unset($this->_storage[$lang][$namespace]);
-    }
+    public function getResource(string $lng, string $ns, $key, array $options = []) {
+        $keySeparator = isset($options['keySeparator']) ? $options['keySeparator'] : $this->_options['keySeparator'];
 
-    public function getByLanguage(string $lang): ?array {
-        return $this->_storage[$lang] ?? null;
+        $path = [$lng, $ns];
+
+        if ($key && !is_string($key))
+            $path = array_merge($path, $key);
+
+        if ($key && is_string($key))
+            $path = array_merge($path, ($keySeparator ? explode($keySeparator, $key) : $key));
+
+        if (mb_strpos($lng, '.') !== false) {
+            $path = explode($lng, '.');
+        }
+
+        return Utils\getPath($this->_data, $path);
     }
 }
