@@ -86,13 +86,65 @@ class LanguageUtil {
         return $this->_whitelist === false || !count($this->_whitelist) || in_array($code, $this->_whitelist);
     }
 
-    public function getFallbackCodes($fallbacks, string $code) {
+    public function getFallbackCodes($fallbacks, ?string $code = null) {
         if (!$fallbacks)
             return [];
 
         if (is_string($fallbacks))
             $fallbacks = [$fallbacks];
 
+        if (is_array($fallbacks))
+            return $fallbacks;
 
+        if ($code === null)
+            return $fallbacks['default'] ?? [];
+
+        $found = $fallbacks[$code] ?? null;
+
+        if ($found === null)
+            $found = $fallbacks[$this->getScriptPartFromCode($code)] ?? null;
+
+        if ($found === null)
+            $found = $fallbacks[$this->formatLanguageCode($code)] ?? null;
+
+        if ($found === null)
+            $found = $fallbacks['default'] ?? null;
+
+        return $found ?? [];
+    }
+
+    public function toResolveHierarchy(?string $code, ?string $fallbackCode) {
+        $fallbackCodes = $this->getFallbackCodes($fallbackCode ?? $this->_options['fallbackLng'] ?? [], $code);
+
+        $codes = [];
+        $addCode = function($c) use (&$codes) {
+            if (!$c)
+                return;
+
+            if ($this->isWhitelisted($c))
+                $codes[] = $c;
+            // else
+                // logger here
+        };
+
+        if (is_string($code) && mb_strpos($code, '-') !== false) {
+            if ($this->_options['load'] ?? false !== 'languageOnly')
+                $addCode($this->formatLanguageCode($code));
+
+            if ($this->_options['load'] ?? false !== 'languageOnly' && $this->_options['load'] ?? false !== 'currentOnly')
+                $addCode($this->formatLanguageCode($code));
+
+            if ($this->_options['load'] ?? false !== 'currentOnly')
+                $addCode($this->getLanguagePartFromCode($code));
+        }
+        else if (is_string($code))
+            $addCode($this->formatLanguageCode($code));
+
+        array_map(function($fc) use (&$addCode, &$codes) {
+            if (!in_array($fc, $codes))
+                $addCode($this->formatLanguageCode($fc));
+        }, $fallbackCodes);
+
+        return $codes;
     }
 }
