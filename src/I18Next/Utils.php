@@ -140,3 +140,22 @@ function getPath(&$object, $path) {
 
     return $res['obj'][$res['k']];
 }
+
+function deepMerge(array $target, array $source, bool $overwrite = false) {
+    foreach ($source as $key => $value) {
+        if (array_key_exists($key, $target)) {
+            if (is_string($source[$key]) && is_string($target[$key])) {
+                if ($overwrite)
+                    $target[$key] = $source[$key];
+            }
+            else {
+                $target = deepMerge($target[$key], $source[$key], $overwrite);
+            }
+        }
+        else {
+            $target[$key] = $source[$key];
+        }
+    }
+
+    return $target;
+}
