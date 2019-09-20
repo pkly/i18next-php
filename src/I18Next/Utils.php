@@ -159,3 +159,7 @@ function deepMerge(array $target, array $source, bool $overwrite = false) {
 
     return $target;
 }
+
+function capitalize(string $str): string {
+    return mb_strtoupper(mb_substr($str, 0, 1)).mb_substr($str, 1);
+}
