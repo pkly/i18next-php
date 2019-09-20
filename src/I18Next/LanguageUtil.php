@@ -27,7 +27,7 @@ class LanguageUtil {
         if (count($p))
             return null;
         array_pop($p);
-        // format language code
+        return $this->formatLanguageCode(implode('-', $p));
     }
 
     public function getLanguagePartFromCode(string $code) {
@@ -35,7 +35,7 @@ class LanguageUtil {
             return $code;
 
         $p = explode('-', $code);
-        // format language code
+        return $this->formatLanguageCode($p[0]);
     }
 
     public function formatLanguageCode(string $code) {
@@ -51,9 +51,48 @@ class LanguageUtil {
             else if (count($p) === 2) {
                 $p[0] = mb_strtolower($p[0]);
                 $p[1] = mb_strtolower($p[1]);
+
+                if (in_array(mb_strtolower($p[1]), $specialCases))
+                    $p[1] = Utils\capitalize(mb_strtolower($p[1]));
             }
+            else if (count($p) === 3) {
+                $p[0] = mb_strtolower($p[0]);
+
+                // if length is 2 guess it's a country
+                if (mb_strlen($p[1]) === 2)
+                    $p[1] = mb_strtoupper($p[1]);
+
+                if ($p[0] !== 'sgn' && mb_strlen($p[2]) === 2)
+                    $p[2] = mb_strtoupper($p[2]);
+
+                if (in_array(mb_strtolower($p[1]), $specialCases))
+                    $p[1] = Utils\capitalize(mb_strtolower($p[1]));
+
+                if (in_array(mb_strtolower($p[2]), $specialCases))
+                    $p[2] = Utils\capitalize(mb_strtolower($p[2]));
+            }
+
+            return implode('-', $p);
         }
 
-        return implode('-', $code);
+        return ($this->_options['cleanCode'] ?? false) || ($this->_options['lowerCaseLng'] ?? false) ? mb_strtolower($code) : $code;
+    }
+
+    public function isWhitelisted(string $code) {
+        if ($this->_options['load'] ?? null === 'languageOnly' || $this->_options['nonExplicitWhitelist'] ?? false) {
+            $code = $this->getLanguagePartFromCode($code);
+        }
+
+        return $this->_whitelist === false || !count($this->_whitelist) || in_array($code, $this->_whitelist);
+    }
+
+    public function getFallbackCodes($fallbacks, string $code) {
+        if (!$fallbacks)
+            return [];
+
+        if (is_string($fallbacks))
+            $fallbacks = [$fallbacks];
+
+
     }
 }
