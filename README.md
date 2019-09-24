@@ -1,5 +1,5 @@
 # i18next-php
-An implementation of [i18next](https://www.i18next.com/) more like the original, in PHP. With a rest API.
+A port of [i18next](https://www.i18next.com/) in PHP. With a rest API. (coming soon \[tm\])
 
 Code in this repository is largely based on the original code base in JavaScript, rewritten in PHP.
 
