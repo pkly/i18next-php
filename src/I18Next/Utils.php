@@ -163,3 +163,24 @@ function deepMerge(array $target, array $source, bool $overwrite = false) {
 function capitalize(string $str): string {
     return mb_strtoupper(mb_substr($str, 0, 1)).mb_substr($str, 1);
 }
+
+function regexEscape(string $str): string {
+    return preg_replace("/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g", "\\$&", $str);
+}
+
+const ENTITY_MAP = [
+    '&'         =>  '&amp;',
+    '<'         =>  '&lt;',
+    '>'         =>  '&gt;',
+    '"'         =>  '&quot;',
+    "'"         =>  '&#39;',
+    '/'         =>  '&#x2F;'
+];
+
+function escape($str) {
+    if (is_string($str)) {
+        return str_replace(array_keys(ENTITY_MAP), ENTITY_MAP, $str);
+    }
+
+    return $str;
+}

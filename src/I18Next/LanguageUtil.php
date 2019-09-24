@@ -124,7 +124,7 @@ class LanguageUtil {
             if ($this->isWhitelisted($c))
                 $codes[] = $c;
             // else
-                // logger here
+                // logger here "rejecting non-whitelisted language code $c"
         };
 
         if (is_string($code) && mb_strpos($code, '-') !== false) {
