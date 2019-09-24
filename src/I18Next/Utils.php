@@ -82,6 +82,27 @@ function transformOptions(?array $options = null) {
 
 function noop(...$args) {}
 
+function copy($search, &$from, &$to) {
+    foreach ($search as $searchKey) {
+        if (is_object($from)) {
+            if (isset($from->{$searchKey})) {
+                if (is_object($to))
+                    $to->{$searchKey} = &$from->{$searchKey};
+                else
+                    $to[$searchKey] = &$from[$searchKey];
+            }
+        }
+        else {
+            if (isset($from[$searchKey])) {
+                if (is_object($to))
+                    $to->{$searchKey} = &$from[$searchKey];
+                else
+                    $to[$searchKey] = &$from[$searchKey];
+            }
+        }
+    }
+}
+
 function getLastOfPath(&$object, $path, $Empty = null) {
     $cleanKey = function ($key) {
         return $key && mb_strpos($key, '###') !== false ? str_replace('###', '.', $key) : $key;
@@ -110,35 +131,35 @@ function getLastOfPath(&$object, $path, $Empty = null) {
         return [];
 
     return [
-        'obj'       =>  &$obj,
-        'k'         =>  $cleanKey(array_shift($stack))
+        &$obj,
+        $cleanKey(array_shift($stack))
     ];
 }
 
 function setPath(&$object, $path, $newValue) {
-    $res = getLastOfPath($object, $path, []);
+    list(&$obj, $key) = getLastOfPath($object, $path, []);
 
-    $res['obj'][$res['k']] = $newValue;
+    $obj[$key] = $newValue;
 }
 
 function pushPath(&$object, $path, $newValue, bool $concat) {
-    $res = getLastOfPath($object, $path, []);
+    list(&$obj, $key) = getLastOfPath($object, $path, []);
 
-    $res['obj'][$res['k']] = $res['obj'][$res['k']] ?? [];
+    $obj[$key] = $obj[$key] ?? [];
 
     if ($concat)
-        $res['obj'][$res['k']] = array_merge($res['obj'][$res['k']], $newValue);
+        $obj[$key] = array_merge($obj[$key], $newValue);
     else
-        $res['obj'][$res['k']][] = $newValue;
+        $obj[$key][] = $newValue;
 }
 
 function getPath(&$object, $path) {
-    $res = getLastOfPath($object, $path);
+    list(&$obj, $key) = getLastOfPath($object, $path);
 
-    if (!isset($res['obj']))
+    if (!isset($obj))
         return null;
 
-    return $res['obj'][$res['k']];
+    return $obj[$key];
 }
 
 function deepMerge(array $target, array $source, bool $overwrite = false) {
