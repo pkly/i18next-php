@@ -135,11 +135,98 @@ class Translator {
 
         $resolved = $this->resolve($keys, $options);
         // TODO: Check resolved use properly
-        $res = $resolved && isset($resolved['res']);
+        $res = $resolved['res'] ?? null;
         $resUsedKey = $resolved['usedKey'] ?? $key;
         $resExactUsedKey = $resolved['exactUsedKey'] ?? $key;
 
+        $resType = gettype($res);
+        $noObject = ['number', 'callable'];
+        $joinArrays = $options['joinArrays'] ?? $this->_options['joinArrays'];
 
+        $handleAsObjectInI18nFormat = $this->_i18nFormat->handleAsObject ?? false;
+        $handleAsObject = !in_array($resType, $noObject);
+
+        if ($handleAsObjectInI18nFormat && $res && $handleAsObject && !(is_string($joinArrays) && $resType === 'array')) {
+            if (!($options['returnObjects'] ?? $this->_options['returnObjects'] ?? false)) {
+                // TODO: warning accessing an object - but returnObjects options is not enabled!
+                return isset($this->_options['returnedObjectHandler']) ?
+                    call_user_func($this->_options['returnedObjectHandler'], $resUsedKey, $res, $options) :
+                    'key ' . $key . ' (' . $this->_language . ') returned an object instead of string';
+            }
+
+            // if we got a separator we loop over children - else we just return object as is
+            // as having it set to false means no hierarchy so no lookup for nested values
+            if ($keySeparator) {
+                // res type is required as array, so if somehow there'd be an object here it's required to implement the array interface
+                $copy = [];
+
+                $newKeyToUse = $resExactUsedKey;
+                foreach ($res as $m => $v) {
+                    $deepKey = $newKeyToUse.$keySeparator.$m;
+                    $copy[$m] = $this->translate($deepKey, array_merge($options, ['joinArrays' => false, 'ns' => $namespaces]));
+
+                    if ($copy[$m] === $deepKey)
+                        $copy[$m] = $res[$m]; // if nothing found use original value as fallback
+                }
+
+                $res = $copy;
+            }
+        }
+        else if ($handleAsObjectInI18nFormat && is_string($joinArrays) && $resType === 'array') {
+            // array special treatment
+            $res = array_merge($res, $joinArrays);
+            if ($res)
+                $res = $this->extendTranslation($res, $keys, $options);
+        }
+        else {
+            // string empty or null
+            $usedDefault = false;
+            $usedKey = false;
+
+            // fallback value
+            if (!$this->isValidLookup($res) && isset($options['defaultValue'])) {
+                $usedDefault = true;
+
+                if (isset($options['count'])) {
+                    $suffix = $this->_pluralResolver->getSuffix($lng, $options['count']);
+                    $res = $options['defaultValue' . $suffix];
+                }
+
+                if (!$res)
+                    $res = $options['defaultValue'];
+            }
+
+            if (!$this->isValidLookup($res)) {
+                $usedKey = true;
+                $res = $key;
+            }
+
+            // TODO: save missing ( https://github.com/i18next/i18next/blob/master/src/Translator.js#L176 )
+
+            // extend
+            $res = $this->extendTranslation($res, $keys, $options, $resolved);
+
+            // append namespace if still key
+            if ($usedKey && $res === $key && $this->_options['appendNamespaceToMissingKey'] ?? true)
+                $res = $namespace . ':' . $key;
+
+            // parseMissingKeyHandler
+            if ($usedKey && isset($this->_options['parseMissingKeyHandler'])) {
+                $res = call_user_func($this->_options['parseMissingKeyHandler'], $res);
+            }
+        }
+
+        return $res;
+    }
+
+    public function extendTranslation($res, $key, $options, $resolved) {
+        if (is_callable($this->_i18nFormat->parse ?? null)) {
+            $res = $this->_i18nFormat->parse($res, $options, $resolved['usedLng'], $resolved['usedNS'], $resolved['usedKey'], $resolved);
+        }
+        else if (!($options['skipInterpolation'] ?? false)) {
+            // i18next.parsing
+
+        }
     }
 
     public function getResource($code, $ns, $key, array $options = []) {
