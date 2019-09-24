@@ -135,7 +135,7 @@ class Interpolator {
         $this->_nestingRegexp = '/' . $this->_nestingPrefix . '(.+?)' . $this->_nestingSuffix . '/';
     }
 
-    public function interpolate(string $str, $data, $lng, $options): string {
+    public function interpolate(string $str, $data, $lng = null, array $options = []): string {
         $defaultData = $this->_options['interpolation']['defaultVariables'] ?? [];
 
         $combinedData = array_merge($defaultData, $data);
@@ -164,6 +164,9 @@ class Interpolator {
 
         do {
             preg_match($this->_regexpUnescape, $str, $match);
+            if (!$match)
+                break;
+
             $value = $handleFormat(trim($match[1] ?? ''));
             if (!$value) {
                 if (is_callable($missingInterpolationHandler)) {
@@ -192,6 +195,9 @@ class Interpolator {
 
         do {
             preg_match($this->_regexp, $str, $match);
+            if (!$match)
+                break;
+
             $value = $handleFormat(trim($match[1] ?? ''));
             if (!$value) {
                 if (is_callable($missingInterpolationHandler)) {
@@ -219,7 +225,59 @@ class Interpolator {
         return $str;
     }
 
-    public function nest(string $str, $fc, array $options = []) {
-        
+    public function nest(string $str, callable $fc, array $options = []) {
+        $clonedOptions = $options;
+        $clonedOptions['applyPostProcessor'] = false;
+
+
+        $handleHasOptions = function (string $key, array $inheritedOptions) use (&$clonedOptions) {
+            if (mb_strpos($key, ',') === false)
+                return $key;
+
+            $p = explode(',', $key);
+            $key = array_shift($p);
+            $optionsString = str_replace("'", '"',$this->interpolate(implode(',', $p), $clonedOptions));
+
+            try {
+                $clonedOptions = json_decode($optionsString);
+                if (json_last_error() !== JSON_ERROR_NONE)
+                    throw new \Exception();
+
+                if ($inheritedOptions)
+                    $clonedOptions = array_merge($inheritedOptions, $clonedOptions);
+            }
+            catch (\Exception $e) {
+                // TODO: logger error failed parsing options string in nesting for key $key
+            }
+
+            return $key;
+        };
+
+        $match = [];
+
+        // regular escape on demand
+        do {
+            preg_match($this->_nestingRegexp, $str, $match);
+            if (!$match)
+                break;
+
+            $value = $fc($handleHasOptions(trim($match[1]), $clonedOptions), $clonedOptions);
+
+            // is only the nesting key (key1 = '$(key2)') return the value without stringify
+            if ($value && $match[0] === $str && !is_string($value)) return $value;
+
+            if (!is_string($value))
+                $value = (string)$value;
+
+            if (!$value) {
+                // TODO: logger warn missed to resolve match1 for nesting str
+                $value = '';
+            }
+
+            $str = str_replace($match[0], $value, $str);
+
+        } while (!empty($match));
+
+        return $str;
     }
 }
