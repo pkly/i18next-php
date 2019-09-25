@@ -225,8 +225,57 @@ class Translator {
         }
         else if (!($options['skipInterpolation'] ?? false)) {
             // i18next.parsing
+            if ($options['interpolation'] ?? false)
+                $this->_interpolator->init(array_merge($options, ['interpolation' => array_merge($this->_options['interpolation'] ?? [], $options['interpolation'] ?? [])]));
 
+            $data = is_array($options['replace'] ?? null) ? $options['replace'] : $options;
+            if (isset($this->_options['interpolation']['defaultVariables']))
+                $data = array_merge($this->_options['interpolation']['defaultVariables'], $data);
+
+            $res = $this->_interpolator->interpolate($res, $data, $options['lng'] ?? $this->_language, $options);
+
+            // nesting
+            if ($options['nest'] ?? true !== false)
+                $res = $this->_interpolator->nest($res, function(...$args) { return $this->translate(...$args); }, $options);
+
+            if ($options['interpolation'] ?? false)
+                $this->_interpolator->reset();
         }
+
+        // post process
+        $postProcess = $options['postProcess'] ?? $this->_options['postProcess'] ?? [];
+        $postProcessorNames = is_string($postProcess) ? [$postProcess] : $postProcess;
+
+        if (!is_array($postProcessorNames))
+            $postProcessorNames = [];
+
+        if ($res && count($postProcessorNames) && $options['applyPostProcessor'] ?? true !== false)
+            $res = PostProcessor::handle($postProcessorNames, $res, $key, $options, $this);
+
+        return $res;
+    }
+
+    public function resolve($keys, array $options = []) {
+        if (!is_array($keys))
+            $keys = [$keys];
+
+        $found = new \stdClass();
+        $usedKey = null;
+        $exactUsedKey = null;
+        $usedLng = null;
+        $usedNS = null;
+
+        foreach ($keys as $key) {
+            if ($this->isValidLookup($found))
+                return;
+        }
+    }
+
+    public function isValidLookup($res) {
+        // In JS this includes an undefined check, but in PHP there's no such thing, so we're creating an stdClass instead, great I know.
+        return !($res instanceof \stdClass) &&
+            !($this->_options['returnNull'] ?? false && $res === null) &&
+            !($this->_options['returnEmptyString'] ?? false && $res === '');
     }
 
     public function getResource($code, $ns, $key, array $options = []) {
