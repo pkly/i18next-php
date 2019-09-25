@@ -265,9 +265,13 @@ class Translator {
         $usedLng = null;
         $usedNS = null;
 
-        foreach ($keys as $key) {
+        foreach ($keys as $k) {
             if ($this->isValidLookup($found))
                 return;
+
+            list ($key, $namespaces) = $this->extractFromKey($k, $options);
+            if (is_array($this->_options['fallbackNS'] ?? null))
+                $namespaces = array_merge($namespaces, $this->_options['fallbackNS']);
         }
     }
 
@@ -279,7 +283,9 @@ class Translator {
     }
 
     public function getResource($code, $ns, $key, array $options = []) {
-        $f = $this->_i18nFormat->getResource ?? $this->_resourceStore->getResource;
+        $f = is_callable([$this->_i18nFormat, 'getResource']) ?
+            \Closure::fromCallable([$this->_i18nFormat, 'getResource']) :
+            \Closure::fromCallable([$this->_resourceStore, 'getResource']);
         return $f($code, $ns, $key, $options);
     }
 }
