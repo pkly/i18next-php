@@ -5,10 +5,10 @@ Code in this repository is largely based on the original code base in JavaScript
 
 ### Warning!
 
-This version is still in early development stages, I'm advising against using it. Yet.
+This version is still in early development stages, I'm advising against using it. As of now.
 This project is something I'm working on between other work, as such the updates may appear spontanously.
 
-It's extremely unlikely that things are broken as right now I'm simply porting over the 
+It's extremely likely that things are broken as right now I'm simply porting over the 
 JS code without testing it for compatibility with PHP.
 
 ### Todo
