@@ -139,6 +139,36 @@ class I18n {
         }
     }
 
+    // TODO: loadResources
+
+    // TODO: reloadResources
+
+    // TODO: use ?
+
+    public function changeLanguage(string $lng) {
+
+    }
+
+    public function getFixedT(string $lng, $ns) {
+
+    }
+
+    public function t(...$args) {
+        return $this->_translator->translate(...$args) ?? null;
+    }
+
+    public function exists(...$args) {
+        return $this->_translator->exists(...$args) ?? null;
+    }
+
+    public function setDefaultNamespace(string $ns) {
+        $this->_options['defaultNS'] = [$ns];
+    }
+
+    // TODO: loadNamespaces
+
+    // TODO: loadLanguages
+
     public function dir(?string $lng): string {
         if (!$lng)
             $lng = $this->_languages[0] ?? $this->_language;
@@ -148,6 +178,7 @@ class I18n {
 
         return in_array($this->_services->_languageUtils->getLanguagePartFromCode($lng), RTL_LANGUAGES) ? 'rtl' : 'ltr';
     }
+
 
     public function __clone() {
         $clone = clone $this;
