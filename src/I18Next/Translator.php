@@ -42,9 +42,13 @@ class Translator {
 
     /**
      * @var null
-     * TODO: Fix this as I've no idea what it is really
      */
     public $_i18nFormat                         =   null;
+
+    /**
+     * @var PostProcessor|null
+     */
+    public $_postProcessor                      =   null;
 
     public function __construct(&$services, array $options = []) {
         Utils\copy([
@@ -53,7 +57,8 @@ class Translator {
             '_pluralResolver',
             '_interpolator',
             '_backendConnector',
-            '_i18nFormat'
+            '_i18nFormat',
+            '_postProcessor'
         ], $services, $this);
 
         $this->_options = $options;
@@ -247,8 +252,8 @@ class Translator {
         if (!is_array($postProcessorNames))
             $postProcessorNames = [];
 
-        if ($res && count($postProcessorNames) && $options['applyPostProcessor'] ?? true !== false)
-            $res = PostProcessor::handle($postProcessorNames, $res, $key, $options, $this);
+        if ($res && count($postProcessorNames) && $options['applyPostProcessor'] ?? true !== false && $this->_postProcessor !== null)
+            $res = $this->_postProcessor->handle($postProcessorNames, $res, $key, $options, $this);
 
         return $res;
     }

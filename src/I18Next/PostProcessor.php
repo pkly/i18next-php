@@ -9,17 +9,17 @@
 namespace Pkly\I18Next;
 
 
-abstract class PostProcessor {
-    protected static $_processors               =   [];
+class PostProcessor {
+    private $_processors                        =   [];
 
-    public static function addPostProcessor(string $name, callable $callable) {
-        self::$_processors[$name] = $callable;
+    public function addPostProcessor(string $name, &$object) {
+        $this->_processors[$name] = &$object;
     }
 
-    public static function handle($processors, $value, $key, array $options, $translator) {
+    public function handle($processors, $value, $key, array $options, $translator) {
         foreach ($processors as $name) {
-            if (array_key_exists($name, self::$_processors))
-                $value = self::$_processors[$name]->process($value, $key, $options, $translator);
+            if (array_key_exists($name, $this->_processors))
+                $value = $this->_processors[$name]->process($value, $key, $options, $translator);
         }
 
         return $value;

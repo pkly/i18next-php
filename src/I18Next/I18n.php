@@ -80,6 +80,11 @@ class I18n {
     private $_translator                        =   null;
 
     /**
+     * @var PostProcessor|null
+     */
+    private $_postProcessor                     =   null;
+
+    /**
      * @var null|I18n
      */
     private static $_instance                   =   null;
@@ -143,7 +148,31 @@ class I18n {
 
     // TODO: reloadResources
 
-    // TODO: use ?
+    /**
+     * Load a module
+     *
+     * @param ModuleInterface $module
+     * @return $this
+     */
+    public function useModule(ModuleInterface &$module) {
+        if ($module->getModuleType() === MODULE_TYPE_LANGUAGE_DETECTOR) {
+            $this->_modules['languageDetector'] = &$module;
+        }
+
+        if ($module->getModuleType() === MODULE_TYPE_I18N_FORMAT) {
+            $this->_modules['i18nFormat'] = &$module;
+        }
+
+        if ($module->getModuleType() === MODULE_TYPE_POST_PROCESSOR && $module instanceof PostProcessorInterface) {
+            $this->_postProcessor->addPostProcessor($module->getModuleName(), $module);
+        }
+
+        if ($module->getModuleType() === MODULE_TYPE_EXTERNAL) {
+            $this->_modules['external'][] = &$module;
+        }
+
+        return $this;
+    }
 
     public function changeLanguage(string $lng) {
 
