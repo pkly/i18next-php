@@ -12,6 +12,13 @@ This project is something I'm working on between other work, as such the updates
 It's extremely likely that things are broken as right now I'm simply porting over the 
 JS code without testing it for compatibility with PHP.
 
+### Features
+
+* PSR3 logging support (psr/log is a hard requirement, but you're not required to actually use a logger)
+* Extremely similar API to the JS version
+* PHP-specific features like interfaces for modules
+* 7.1+ syntax / support
+
 ### Todo
 
 * Finish all components
