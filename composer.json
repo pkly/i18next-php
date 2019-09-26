@@ -20,8 +20,8 @@
 		"phpunit/phpunit": "6.*"
     },
     "autoload": {
-        "psr-0": {
-            "I18Next\\": "src/"
+        "psr-4": {
+            "Pkly\\I18Next\\": "src/"
         }
     }
 }
