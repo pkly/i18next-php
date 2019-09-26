@@ -9,6 +9,8 @@
 namespace Pkly\I18Next;
 
 
+use Psr\Log\LoggerInterface;
+
 class Translator {
     /**
      * @var array
@@ -50,6 +52,11 @@ class Translator {
      */
     public $_postProcessor                      =   null;
 
+    /**
+     * @var LoggerInterface|null
+     */
+    public $_logger                             =   null;
+
     public function __construct(&$services, array $options = []) {
         Utils\copy([
             '_resourceStore',
@@ -58,15 +65,14 @@ class Translator {
             '_interpolator',
             '_backendConnector',
             '_i18nFormat',
-            '_postProcessor'
+            '_postProcessor',
+            '_logger'
         ], $services, $this);
 
         $this->_options = $options;
         if (!isset($this->_options['keySeparator'])) {
             $this->_options['keySeparator'] = '.';
         }
-
-        // TODO: Create logger for component
     }
 
     public function changeLanguage(string $lng) {
@@ -137,7 +143,6 @@ class Translator {
         }
 
         $resolved = $this->resolve($keys, $options);
-        // TODO: Check resolved use properly
         $res = $resolved['res'];
         $resUsedKey = $resolved['usedKey'] ?? $key;
         $resExactUsedKey = $resolved['exactUsedKey'] ?? $key;
@@ -151,7 +156,7 @@ class Translator {
 
         if ($handleAsObjectInI18nFormat && $res && $handleAsObject && !(is_string($joinArrays) && $resType === 'array')) {
             if (!($options['returnObjects'] ?? $this->_options['returnObjects'] ?? false)) {
-                // TODO: warning accessing an object - but returnObjects options is not enabled!
+                $this->_logger->warning('Accessing an object - but returnObjects option is not enabled!');
                 return isset($this->_options['returnedObjectHandler']) ?
                     call_user_func($this->_options['returnedObjectHandler'], $resUsedKey, $res, $options) :
                     'key ' . $key . ' (' . $this->_language . ') returned an object instead of string';
@@ -223,7 +228,7 @@ class Translator {
     }
 
     public function extendTranslation($res, $key, $options, array $resolved = []) {
-        if (is_callable($this->_i18nFormat->parse ?? null)) {
+        if (is_callable([$this->_i18nFormat, 'parse'])) {
             $res = $this->_i18nFormat->parse($res, $options, $resolved['usedLng'], $resolved['usedNS'], $resolved['usedKey'], $resolved);
         }
         else if (!($options['skipInterpolation'] ?? false)) {

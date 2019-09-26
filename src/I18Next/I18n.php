@@ -8,6 +8,10 @@
 
 namespace Pkly\I18Next;
 
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+
 require_once __DIR__ . '/Utils.php';
 
 const RTL_LANGUAGES = [
@@ -38,11 +42,16 @@ const STORE_API = [
  *
  * @package Pkly\I18Next
  */
-class I18n {
+class I18n implements LoggerAwareInterface {
     /**
      * @var array
      */
     private $_options                           =   [];
+
+    /**
+     * @var LoggerInterface|null
+     */
+    private $_logger                            =   null;
 
     /**
      * @var array
@@ -92,9 +101,9 @@ class I18n {
     /**
      * @return I18n
      */
-    public static function get(): I18n {
+    public static function &get(...$args): I18n {
         if (self::$_instance === null)
-            self::$_instance = new I18n();
+            self::$_instance = new I18n(...$args);
 
         return self::$_instance;
     }
@@ -103,8 +112,14 @@ class I18n {
         $this->_options = Utils\transformOptions($options);
 
         $this->_services = new \stdClass();
+        $this->_logger = new NullLogger();
 
         $this->init($this->_options);
+    }
+
+    public function setLogger(LoggerInterface $logger) {
+        $this->_logger = $logger;
+        return $this;
     }
 
     public function init(array $options = []) {
@@ -114,11 +129,9 @@ class I18n {
 
         // init services
         if (!$this->_options['isClone']) {
-            // TODO: Create logger
-
             $this->_store = new ResourceStore($this->_options['resources'] ?? [], $this->_options);
 
-            // TODO: Add logged to services as _logger
+            $this->_services->_logger = &$this->_logger;
             $this->_services->_resourceStore = &$this->_store;
             $this->_services->_languageUtils = new LanguageUtil($this->_options);
             $this->_services->_pluralResolver = new PluralResolver($this->_services->_languageUtils, [
@@ -126,7 +139,7 @@ class I18n {
                 'compatibilityJSON'     =>  $this->_options['compatibilityJSON'],
                 'simplifyPluralSuffix'  =>  $this->_options['simplifyPluralSuffix']
             ]);
-            $this->_services->_interpolator = new Interpolator($this->_options);
+            $this->_services->_interpolator = new Interpolator($this->_options, $this->_logger);
 
             // TODO: look over the module loading code from ( https://github.com/i18next/i18next/blob/master/src/i18next.js#L86 )
 

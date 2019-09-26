@@ -8,11 +8,19 @@
 
 namespace Pkly\I18Next;
 
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+
 class Interpolator {
     /**
      * @var array
      */
     private $_options                           =   [];
+
+    /**
+     * @var LoggerInterface|null
+     */
+    private $_logger                            =   null;
 
     /**
      * @var \Closure|null
@@ -89,11 +97,14 @@ class Interpolator {
      */
     private $_nestingRegexp                     =   '';
 
-    public function __construct(array $options = []) {
-        // TODO: Create logger for component
-
+    public function __construct(array $options = [], ?LoggerInterface $logger = null) {
         $this->_options = $options;
         $this->_format = $options['interpolation']['format'] ?? function ($value, $format, $lng) { return $value; };
+
+        if ($logger === null)
+            $logger = new NullLogger();
+
+        $this->_logger = $logger;
     }
 
     public function init(array $options = []) {
@@ -174,7 +185,7 @@ class Interpolator {
                     $value = is_string($temp) ? $temp : '';
                 }
                 else {
-                    // TODO: Add logger warn missed to pass in variable match[1] for interpolating str
+                    $this->_logger->warning('Missed to pass in variable '.$match[1].' for interpolating '.$str);
                     $value = '';
                 }
             }
@@ -205,7 +216,7 @@ class Interpolator {
                     $value = is_string($temp) ? $temp : '';
                 }
                 else {
-                    // TODO: Add logger warn missed to pass in variable match[1] for interpolating str
+                    $this->_logger->warning('Missed to pass in variable '.$match[1].' for interpolating '.$str);
                     $value = '';
                 }
             }
@@ -247,7 +258,7 @@ class Interpolator {
                     $clonedOptions = array_merge($inheritedOptions, $clonedOptions);
             }
             catch (\Exception $e) {
-                // TODO: logger error failed parsing options string in nesting for key $key
+                $this->_logger->error('Failed parsing options string in nesting for key '.$key);
             }
 
             return $key;
@@ -270,7 +281,7 @@ class Interpolator {
                 $value = (string)$value;
 
             if (!$value) {
-                // TODO: logger warn missed to resolve match1 for nesting str
+                $this->_logger->warning('Missed to pass in variable '.$match[1].' for nesting '.$str);
                 $value = '';
             }
 

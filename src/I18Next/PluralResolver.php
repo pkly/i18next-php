@@ -8,6 +8,8 @@
 
 namespace Pkly\I18Next;
 
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 const SETS = [
     [
         'lngs'  =>  ['ach','ak','am','arn','br','fil','gun','ln','mfe','mg','mi','oc', 'pt', 'pt-BR',
@@ -225,6 +227,11 @@ class PluralResolver {
     private $_options                           =   [];
 
     /**
+     * @var LoggerInterface|null
+     */
+    private $_logger                            =   null;
+
+    /**
      * @var LanguageUtil|null
      */
     private $_languageUtils                     =   null;
@@ -234,11 +241,14 @@ class PluralResolver {
      */
     private $_rules                             =   [];
 
-    public function __construct(LanguageUtil &$languageUtils, array $options = []) {
+    public function __construct(LanguageUtil &$languageUtils, array $options = [], ?LoggerInterface $logger = null) {
         $this->_languageUtils = &$languageUtils;
         $this->_options = $options;
 
-        // TODO: create logger for PluralResolver
+        if ($logger === null)
+            $logger = new NullLogger();
+
+        $this->_logger = $logger;
 
         $this->_rules = createRules();
     }
@@ -294,7 +304,7 @@ class PluralResolver {
             return $this->_options['prepend'] ?? '' . $idx;
         }
 
-        // TODO: logger warn no plural rule found for $code
+        $this->_logger->warning('No plural rule found for '.$code);
         return '';
     }
 }
