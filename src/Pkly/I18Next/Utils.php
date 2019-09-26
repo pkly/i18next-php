@@ -6,7 +6,7 @@
  * Time: 14:47
  */
 
-namespace I18Next\Utils;
+namespace Pkly\I18Next\Utils;
 
 function getDefaults() {
     return [

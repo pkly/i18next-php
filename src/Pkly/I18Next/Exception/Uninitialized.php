@@ -6,7 +6,7 @@
  * Time: 13:34
  */
 
-namespace I18Next\Exception;
+namespace Pkly\I18Next\Exception;
 
 
 class Uninitialized extends Exception {}

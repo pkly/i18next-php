@@ -6,7 +6,7 @@
  * Time: 08:46
  */
 
-namespace I18Next;
+namespace Pkly\I18Next;
 
 
 abstract class PostProcessor {

@@ -6,7 +6,7 @@
  * Time: 08:32
  */
 
-namespace I18Next;
+namespace Pkly\I18Next;
 
 
 class LanguageUtil {

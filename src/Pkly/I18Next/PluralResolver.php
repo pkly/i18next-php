@@ -6,7 +6,7 @@
  * Time: 09:47
  */
 
-namespace I18Next;
+namespace Pkly\I18Next;
 
 const SETS = [
     [

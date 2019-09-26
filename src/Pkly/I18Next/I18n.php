@@ -6,7 +6,7 @@
  * Time: 13:06
  */
 
-namespace I18Next;
+namespace Pkly\I18Next;
 
 require_once __DIR__ . '/Utils.php';
 

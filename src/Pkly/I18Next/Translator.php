@@ -6,7 +6,7 @@
  * Time: 14:45
  */
 
-namespace I18Next;
+namespace Pkly\I18Next;
 
 
 class Translator {

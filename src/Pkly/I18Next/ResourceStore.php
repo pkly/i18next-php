@@ -6,7 +6,7 @@
  * Time: 14:04
  */
 
-namespace I18Next;
+namespace Pkly\I18Next;
 
 
 class ResourceStore implements \JsonSerializable {

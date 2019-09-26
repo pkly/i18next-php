@@ -6,7 +6,7 @@
  * Time: 13:35
  */
 
-namespace I18Next\Exception;
+namespace Pkly\I18Next\Exception;
 
 
 class Exception extends \Exception {}
