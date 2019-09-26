@@ -31,8 +31,7 @@ class Translator {
     public $_languageUtils                      =   null;
 
     /**
-     * @var null
-     * TODO: Add reference to PluralResolver after creation
+     * @var PluralResolver|null
      */
     public $_pluralResolver                     =   null;
 

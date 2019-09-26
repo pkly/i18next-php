@@ -18,6 +18,7 @@ JS code without testing it for compatibility with PHP.
 * Port over tests
 * Actually test it
 * Add PHP-specific loading code for files, searching etc.
+* Add PHPDocs with examples and links to i18next
 
 #### Donate
 
