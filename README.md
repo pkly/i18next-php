@@ -15,7 +15,6 @@ JS code without testing it for compatibility with PHP.
 ### Todo
 
 * Finish all components
-* Prepare for composer use (it will not be a solid requirement)
 * Port over tests
 * Actually test it
 * Add PHP-specific loading code for files, searching etc.

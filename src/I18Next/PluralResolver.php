@@ -234,8 +234,8 @@ class PluralResolver {
      */
     private $_rules                             =   [];
 
-    public function __construct(?LanguageUtil $languageUtils, array $options = []) {
-        $this->_languageUtils = $languageUtils;
+    public function __construct(LanguageUtil &$languageUtils, array $options = []) {
+        $this->_languageUtils = &$languageUtils;
         $this->_options = $options;
 
         // TODO: create logger for PluralResolver

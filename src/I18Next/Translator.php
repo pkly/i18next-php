@@ -46,7 +46,7 @@ class Translator {
      */
     public $_i18nFormat                         =   null;
 
-    public function __construct($services, array $options = []) {
+    public function __construct(&$services, array $options = []) {
         Utils\copy([
             '_resourceStore',
             '_languageUtils',

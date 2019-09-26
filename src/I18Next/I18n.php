@@ -18,6 +18,26 @@ const RTL_LANGUAGES = [
     'yi', 'hbo', 'men', 'xmn', 'fa', 'jpr', 'peo', 'pes', 'prs', 'dv', 'sam',
 ];
 
+const STORE_API = [
+    'getResource',
+    'addResource',
+    'addResources',
+    'addResourceBundle',
+    'removeResourceBundle',
+    'hasResourceBundle',
+    'getResourceBundle',
+    'getDataByLanguage'
+];
+
+/**
+ * Class I18n
+ *
+ * Base class for translating text
+ *
+ * To use either create a new instance yourself, or simply initialize it globally via I18n::get() (suggested)
+ *
+ * @package Pkly\I18Next
+ */
 class I18n {
     /**
      * @var array
@@ -40,9 +60,24 @@ class I18n {
     private $_modules                           =   ['external' => []];
 
     /**
+     * @var null|\Closure
+     */
+    private $_format                            =   null;
+
+    /**
      * @var null|\stdClass
      */
     private $_services                          =   null;
+
+    /**
+     * @var ResourceStore|null
+     */
+    private $_store                             =   null;
+
+    /**
+     * @var Translator|null
+     */
+    private $_translator                        =   null;
 
     /**
      * @var null|I18n
@@ -68,7 +103,40 @@ class I18n {
     }
 
     public function init(array $options = []) {
+        $this->_options = array_merge_recursive(Utils\getDefaults(), $this->_options, Utils\transformOptions($options));
 
+        $this->_format = $this->_options['interpolation']['format'];
+
+        // init services
+        if (!$this->_options['isClone']) {
+            // TODO: Create logger
+
+            $this->_store = new ResourceStore($this->_options['resources'] ?? [], $this->_options);
+
+            // TODO: Add logged to services as _logger
+            $this->_services->_resourceStore = &$this->_store;
+            $this->_services->_languageUtils = new LanguageUtil($this->_options);
+            $this->_services->_pluralResolver = new PluralResolver($this->_services->_languageUtils, [
+                'prepend'               =>  $this->_options['pluralSeparator'],
+                'compatibilityJSON'     =>  $this->_options['compatibilityJSON'],
+                'simplifyPluralSuffix'  =>  $this->_options['simplifyPluralSuffix']
+            ]);
+            $this->_services->_interpolator = new Interpolator($this->_options);
+
+            // TODO: look over the module loading code from ( https://github.com/i18next/i18next/blob/master/src/i18next.js#L86 )
+
+            $this->_translator = new Translator($this->_services, $this->_options);
+
+            // TODO: Possibly init modules?
+
+            // append api
+            foreach (STORE_API as $fcName) {
+                unset($this->{$fcName});
+                $this->{$fcName} = function (...$args) use ($fcName) {
+                    return call_user_func([$this->_store, $fcName], ...$args);
+                };
+            }
+        }
     }
 
     public function dir(?string $lng): string {
