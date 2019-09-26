@@ -8,7 +8,6 @@
 
 namespace Pkly\I18Next;
 
-
 interface PostProcessorInterface {
     public function process();
 }

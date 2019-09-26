@@ -8,7 +8,6 @@
 
 namespace Pkly\I18Next;
 
-
 class LanguageUtil {
     private $_options                           =   [];
     private $_whitelist                         =   false;

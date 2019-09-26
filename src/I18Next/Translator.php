@@ -8,7 +8,6 @@
 
 namespace Pkly\I18Next;
 
-
 use Psr\Log\LoggerInterface;
 
 class Translator {

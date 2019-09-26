@@ -8,7 +8,6 @@
 
 namespace Pkly\I18Next;
 
-
 class PostProcessor {
     private $_processors                        =   [];
 

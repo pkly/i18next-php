@@ -8,7 +8,6 @@
 
 namespace Pkly\I18Next;
 
-
 class ResourceStore implements \JsonSerializable {
     private $_data                              =   [];
     private $_options                           =   [];
