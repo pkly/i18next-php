@@ -72,8 +72,7 @@ class Translator {
 
     public function exists(string $key, array $options = ['interpolation' => []]): bool {
         $resolved = $this->resolve($key, $options);
-        // TODO: Check resolved use properly
-        return $resolved && isset($resolved['res']);
+        return $resolved && !($resolved['res'] instanceof \stdClass);
     }
 
     public function extractFromKey(string $key, array $options = []) {
@@ -135,7 +134,7 @@ class Translator {
 
         $resolved = $this->resolve($keys, $options);
         // TODO: Check resolved use properly
-        $res = $resolved['res'] ?? null;
+        $res = $resolved['res'];
         $resUsedKey = $resolved['usedKey'] ?? $key;
         $resExactUsedKey = $resolved['exactUsedKey'] ?? $key;
 
@@ -219,7 +218,7 @@ class Translator {
         return $res;
     }
 
-    public function extendTranslation($res, $key, $options, $resolved) {
+    public function extendTranslation($res, $key, $options, array $resolved = []) {
         if (is_callable($this->_i18nFormat->parse ?? null)) {
             $res = $this->_i18nFormat->parse($res, $options, $resolved['usedLng'], $resolved['usedNS'], $resolved['usedKey'], $resolved);
         }
@@ -267,12 +266,73 @@ class Translator {
 
         foreach ($keys as $k) {
             if ($this->isValidLookup($found))
-                return;
+                break;
 
             list ($key, $namespaces) = $this->extractFromKey($k, $options);
             if (is_array($this->_options['fallbackNS'] ?? null))
                 $namespaces = array_merge($namespaces, $this->_options['fallbackNS']);
+
+            $needsPluralHandling = !is_string($options['count'] ?? '');
+            $needsContextHandling = is_string($options['context'] ?? null) && $options['context'] ?? '' !== '';
+
+            $codes = $options['lngs'] ?? $this->_languageUtils->toResolveHierarchy($options['lng'] ?? $this->_language, $options['fallbackLng'] ?? null);
+
+            foreach ($namespaces as $ns) {
+                if ($this->isValidLookup($found))
+                    break;
+                $usedNS = $ns;
+
+                foreach ($codes as $code) {
+                    if ($this->isValidLookup($found))
+                        break;
+
+                    $usedLng = $code;
+
+                    $finalKey = $key;
+                    $finalKeys = [$finalKey];
+
+                    if ($this->_i18nFormat !== null && is_callable([$this->_i18nFormat, 'addLookupKeys'])) {
+                        $this->_i18nFormat->addLookupKeys($finalKeys, $key, $code, $ns, $options);
+                    }
+                    else {
+                        $pluralSuffix = '';
+                        if ($needsPluralHandling)
+                            $pluralSuffix = $this->_pluralResolver->getSuffix($code, $options['count']);
+
+                        // fallback for plural if context not found
+                        if ($needsPluralHandling && $needsContextHandling)
+                            $finalKeys[] = $finalKey . $pluralSuffix;
+
+                        // get key for context if needed
+                        if ($needsContextHandling)
+                            $finalKeys[] = $finalKey .= $this->_options['contextSeparator'] ?? '' . $options['context'];
+
+                        // get key for plural if needed
+                        if ($needsPluralHandling)
+                            $finalKeys[] = $finalKey .= $pluralSuffix;
+                    }
+
+                    // iterate over $finalKeys starting with most specific plural key (-> context key only) -> singular key only
+                    $possibleKey = null;
+
+                    while (($possibleKey = array_pop($finalKeys))) {
+                        if ($this->isValidLookup($found))
+                            break;
+
+                        $exactUsedKey = $possibleKey;
+                        $found = $this->getResource($code, $ns, $possibleKey, $options);
+                    }
+                }
+            }
         }
+
+        return [
+            'res'               =>  $found,
+            'usedKey'           =>  $usedKey,
+            'exactUsedKey'      =>  $exactUsedKey,
+            'usedLng'           =>  $usedLng,
+            'usedNS'            =>  $usedNS
+        ];
     }
 
     public function isValidLookup($res) {
