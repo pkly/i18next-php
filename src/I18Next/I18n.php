@@ -94,7 +94,7 @@ class I18n implements LoggerAwareInterface {
     private $_postProcessor                     =   null;
 
     /**
-     * @var Loader|null
+     * @var TranslationLoadManager|null
      */
     private $_loader                            =   null;
 
@@ -146,7 +146,7 @@ class I18n implements LoggerAwareInterface {
             ]);
             $this->_services->_interpolator = new Interpolator($this->_options, $this->_logger);
 
-            $this->_loader = new Loader($this->_store, $this->_services, $this->_options);
+            $this->_loader = new TranslationLoadManager($this->_store, $this->_services, $this->_options);
             $this->_services->_loader = &$this->_loader;
 
             // TODO: look over the module loading code from ( https://github.com/i18next/i18next/blob/master/src/i18next.js#L86 )

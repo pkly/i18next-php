@@ -3,64 +3,38 @@
  * Created by PhpStorm.
  * User: pkly
  * Date: 27.09.2019
- * Time: 10:37
+ * Time: 12:13
  */
 
 namespace Pkly\I18Next;
 
-
-use Psr\Log\LoggerInterface;
-
-class Loader {
+class Loader implements ModuleInterface {
     /**
-     * @var array
+     * @inheritDoc
      */
-    private $_options                           =   [];
-
-    /**
-     * @var ResourceStore|null
-     */
-    private $_store                             =   null;
+    public function getModuleType(): string {
+        return MODULE_TYPE_LOADER;
+    }
 
     /**
-     * @var LanguageUtil|null
+     * @inheritDoc
      */
-    private $_languageUtils                     =   null;
+    public function getModuleName(): string {
+        return 'loader-base';
+    }
 
     /**
-     * @var LoggerInterface|null
+     * @inheritDoc
      */
-    private $_logger                            =   null;
-
-    public function __construct(ResourceStore &$store, &$services, array $options = []) {
-        $this->_store = &$store;
-        $this->_options = $options;
-        $this->_languageUtils = &$services->_languageUtils;
-        $this->_logger = &$services->_logger;
+    public function init(&$services, array $options, I18n &$instance): void {
+        return;
     }
 
-    public function read($lng, $ns, $fcName, $tried = 0) {
-        if (!$lng)
-            return;
-
+    public function create($languages, $namespace, $key, $fallbackValue, array $options = [], $isUpdate = false) {
 
     }
 
-    public function prepareLoading($languages, $namespaces, array $options = []) {
-
-    }
-
-    public function load($languages, $namespaces) {
-        $this->prepareLoading($languages, $namespaces);
-    }
-
-    public function reload($languages, $namespaces) {
-        $this->prepareLoading($languages, $namespaces, ['reload' => true]);
-    }
-
-    public function loadOne($name, string $prefix = '') {
-        list($lng, $ns) = explode("|", $name);
-
+    public function read($language, $namespace) {
 
     }
 }
