@@ -54,6 +54,63 @@ class TranslationLoadManager {
         $this->_logger = &$services->_logger;
     }
 
+    public function queueLoad(array $languages, array $namespaces, array $options = []) {
+        $toLoad = [];
+        $pending = [];
+        $toLoadLanguages = [];
+        $toLoadNamespaces = [];
+
+        foreach ($languages as $lng) {
+            $hasAllNamespaces = true;
+
+            foreach ($namespaces as $ns) {
+                $name = $lng . '|' . $ns;
+
+                if (!$options['reload'] ?? false && $this->_store->hasResourceBundle($lng, $ns)) {
+                    $this->_state[$name] = 2; // loaded
+                }
+                else if ($this->_state[$name] ?? 0 < 0) {
+                    // nothing?
+                }
+                else if ($this->_state[$name] ?? 0 === 1) {
+                    if (!in_array($name, $pending))
+                        $pending[] = $name;
+                }
+                else {
+                    $this->_state[$name] = 1;
+
+                    $hasAllNamespaces = false;
+
+                    if (!in_array($name, $pending))
+                        $pending[] = $name;
+
+                    if (!in_array($name, $toLoad))
+                        $toLoad[] = $name;
+
+                    if (!in_array($ns, $toLoadNamespaces))
+                        $toLoadNamespaces[] = $ns;
+                }
+            }
+
+            if (!$hasAllNamespaces)
+                $toLoadLanguages[] = $lng;
+        }
+
+        if (count($toLoad) || count($pending))
+            $this->_queue[] = [
+                'pending'       =>  $pending,
+                'loaded'        =>  [],
+                'errors'        =>  []
+            ];
+
+        return [
+            'toLoad'                =>  $toLoad,
+            'pending'               =>  $pending,
+            'toLoadLanguages'       =>  $toLoadLanguages,
+            'toLoadNamespaces'      =>  $toLoadNamespaces
+        ];
+    }
+
     public function loaded($name, $data) {
         list($lng, $ns) = explode("|", $name);
 
@@ -77,6 +134,17 @@ class TranslationLoadManager {
     }
 
     public function prepareLoading($languages, $namespaces, array $options = []) {
+        if ($this->_loader === null) {
+            $this->_logger->warning('No loader was added via i18next.useModule. Will not load resources.');
+            return;
+        }
+
+        if (is_string($languages))
+            $languages = $this->_languageUtils->toResolveHierarchy($languages);
+
+        if (is_string($namespaces))
+            $namespaces = [$namespaces];
+
 
     }
 
@@ -94,12 +162,12 @@ class TranslationLoadManager {
         try {
             $data = $this->read($lng, $ns, 'read');
             if ($data !== null)
-                $this->_logger->info('Loaded namespace ' . $ns . ' for language ' . $lng, (array)$data);
+                $this->_logger->info($prefix . 'Loaded namespace ' . $ns . ' for language ' . $lng, (array)$data);
 
             $this->loaded($name, $data);
         }
         catch (\Exception $e) {
-            $this->_logger->warning('Loading namespace ' . $ns . ' for language '. $lng . ' failed', (array)$e);
+            $this->_logger->warning($prefix . 'Loading namespace ' . $ns . ' for language '. $lng . ' failed', (array)$e);
             $this->_state[$name] = -1;
         }
     }

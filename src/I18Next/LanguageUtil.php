@@ -112,7 +112,7 @@ class LanguageUtil {
         return $found ?? [];
     }
 
-    public function toResolveHierarchy(?string $code, ?string $fallbackCode) {
+    public function toResolveHierarchy(?string $code, ?string $fallbackCode = null) {
         $fallbackCodes = $this->getFallbackCodes($fallbackCode ?? $this->_options['fallbackLng'] ?? [], $code);
 
         $codes = [];
