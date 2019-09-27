@@ -94,7 +94,7 @@ class I18n implements LoggerAwareInterface {
     private $_postProcessor                     =   null;
 
     /**
-     * @var LoaderInterface|null
+     * @var Loader|null
      */
     private $_loader                            =   null;
 
@@ -146,6 +146,9 @@ class I18n implements LoggerAwareInterface {
             ]);
             $this->_services->_interpolator = new Interpolator($this->_options, $this->_logger);
 
+            $this->_loader = new Loader($this->_store, $this->_services, $this->_options);
+            $this->_services->_loader = &$this->_loader;
+
             // TODO: look over the module loading code from ( https://github.com/i18next/i18next/blob/master/src/i18next.js#L86 )
 
             $this->_translator = new Translator($this->_services, $this->_options);
@@ -194,7 +197,15 @@ class I18n implements LoggerAwareInterface {
         }
     }
 
-    // TODO: reloadResources
+    public function reloadResources($lngs = null, $ns = null) {
+        if (!$lngs)
+            $lngs = $this->_languages;
+
+        if (!$ns)
+            $ns = $this->_options['ns'];
+
+        $this->_loader->reload($lngs, $ns);
+    }
 
     /**
      * Load a module
@@ -217,10 +228,6 @@ class I18n implements LoggerAwareInterface {
 
         if ($module->getModuleType() === MODULE_TYPE_EXTERNAL) {
             $this->_modules['external'][] = &$module;
-        }
-
-        if ($module->getModuleType() === MODULE_TYPE_LOADER && $module instanceof LoaderInterface) {
-            $this->_loader = &$module;
         }
 
         return $this;
