@@ -22,6 +22,9 @@
     "require-dev": {
 		"phpunit/phpunit": "6.*"
     },
+    "suggest": {
+        "monolog/monolog": "An excellent logging solution, integrates seamlessly"
+    },
     "autoload": {
         "psr-4": {
             "Pkly\\I18Next\\": "src/"

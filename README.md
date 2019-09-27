@@ -19,6 +19,12 @@ JS code without testing it for compatibility with PHP.
 * PHP-specific features like interfaces for modules
 * 7.1+ syntax / support
 
+### Composer
+
+Simply enter your project directory and run
+
+`composer require pkly/i18next-php`
+
 ### Todo
 
 * Finish all components
@@ -26,6 +32,10 @@ JS code without testing it for compatibility with PHP.
 * Actually test it
 * Add PHP-specific loading code for files, searching etc.
 * Add PHPDocs with examples and links to i18next
+
+#### Packagist
+
+Visit the page [here](https://packagist.org/packages/pkly/i18next-php)
 
 #### Donate
 
