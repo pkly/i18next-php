@@ -193,7 +193,6 @@ class I18n implements LoggerAwareInterface {
             $this->_loader->load($toLoad, $this->_options['ns']);
         }
     }
-    // TODO: loadResources
 
     // TODO: reloadResources
 
