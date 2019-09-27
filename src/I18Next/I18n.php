@@ -191,8 +191,39 @@ class I18n implements LoggerAwareInterface {
 
     }
 
-    public function getFixedT(string $lng, $ns) {
+    /**
+     * @param string[]|string $lng
+     * @param string[]|string $ns
+     * @return \Closure
+     */
+    public function getFixedT($lng, $ns) {
+        $staticOptions = [
+            'ns'                                    =>  $ns,
+            (is_string($lng) ? 'lng' : 'lngs')      =>  $lng
+        ];
 
+        return function ($key, $opts, ...$rest) use ($staticOptions) {
+            $options = [];
+            if (!is_array($opts)) {
+                $options = call_user_func([$this->_options, 'overloadTranslationOptionHandler'], array_merge([$key, $opts], $rest));
+            }
+            else {
+                $options = $opts;
+            }
+
+            $options['lng'] = $options['lng'] ?? $staticOptions['lng'] ?? null;
+            $options['lngs'] = $options['lngs'] ?? $staticOptions['lngs'] ?? null;
+            $options['ns'] = $options['ns'] ?? $staticOptions['ns'];
+
+            // PHP fix because we don't actually want these garbage keys
+            if ($options['lng'] === null)
+                unset($options['lng']);
+
+            if ($options['lngs'] === null)
+                unset($options['lngs']);
+
+            return $this->t($key, $options);
+        };
     }
 
     public function t(...$args) {

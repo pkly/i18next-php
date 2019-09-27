@@ -49,7 +49,24 @@ function getDefaults() {
         'parseMissingKeyHandler'                =>  false,
         'appendNamespaceToMissingKey'           =>  false,
         'appendNamespaceToCIMode'               =>  false,
-        'overloadTranslationOptionHandler'      =>  null,
+        'overloadTranslationOptionHandler'      =>  function (...$args) {
+            $ret = [];
+
+            if (is_array($args[1]))
+                $ret = $args[1];
+            if (is_string($args[1]))
+                $ret['defaultValue'] = $args[1];
+            if (is_string($args[2]))
+                $ret['tDescription'] = $args[2];
+            if (is_array($args[2]) || is_array($args[3])) {
+                $options = $args[3] ?? $args[2];
+                foreach ($options as $key => $option) {
+                    $ret[$key] = $option;
+                }
+            }
+
+            return $ret;
+        },
 
         /* Interpolation */
         'interpolation'                         =>  [
