@@ -12,6 +12,7 @@ const MODULE_TYPE_LANGUAGE_DETECTOR             =   'languageDetector';
 const MODULE_TYPE_I18N_FORMAT                   =   'i18nFormat';
 const MODULE_TYPE_POST_PROCESSOR                =   'postProcessor';
 const MODULE_TYPE_EXTERNAL                      =   '3rdParty';
+const MODULE_TYPE_LOADER                        =   'loader';
 
 /**
  * Interface ModuleInterface
@@ -30,6 +31,7 @@ interface ModuleInterface {
      * @see MODULE_TYPE_I18N_FORMAT
      * @see MODULE_TYPE_POST_PROCESSOR
      * @see MODULE_TYPE_EXTERNAL
+     * @see MODULE_TYPE_LOADER
      * @return string
      */
     public function getModuleType(): string;

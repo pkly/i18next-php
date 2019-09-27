@@ -94,6 +94,11 @@ class I18n implements LoggerAwareInterface {
     private $_postProcessor                     =   null;
 
     /**
+     * @var LoaderInterface|null
+     */
+    private $_loader                            =   null;
+
+    /**
      * @var null|I18n
      */
     private static $_instance                   =   null;
@@ -157,6 +162,37 @@ class I18n implements LoggerAwareInterface {
         }
     }
 
+    public function loadResources() {
+        if (!$this->_options['resources'] ?? false || $this->_options['partialBundledLanguages']) {
+            if ($this->_language && mb_strtolower($this->_language) === 'cimode')
+                return; // avoid loading resources for cimode
+
+            $toLoad = [];
+
+            $append = function ($lng) use (&$toLoad) {
+                if (!$lng)
+                    return;
+
+                foreach ($this->_services->_languageUtils->toResolveHierarchy($lng) as $l) {
+                    if (!in_array($l, $toLoad))
+                        $toLoad[] = $l;
+                }
+            };
+
+            if (!$this->_language) {
+                // at least load fallbacks in this case
+                $fallbacks = call_user_func([$this->_services->_languageUtils, 'getFallbackCodes'], $this->_options['fallbackLng']);
+                array_map($append, $fallbacks);
+            }
+            else
+                $append($this->_language);
+
+            if ($this->_options['preload'] && is_array($this->_options['preload']))
+                array_map($append, $this->_options['preload']);
+
+            $this->_loader->load($toLoad, $this->_options['ns']);
+        }
+    }
     // TODO: loadResources
 
     // TODO: reloadResources
@@ -182,6 +218,10 @@ class I18n implements LoggerAwareInterface {
 
         if ($module->getModuleType() === MODULE_TYPE_EXTERNAL) {
             $this->_modules['external'][] = &$module;
+        }
+
+        if ($module->getModuleType() === MODULE_TYPE_LOADER && $module instanceof LoaderInterface) {
+            $this->_loader = &$module;
         }
 
         return $this;

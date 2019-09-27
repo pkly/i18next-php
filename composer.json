@@ -27,7 +27,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Pkly\\I18Next\\": "src/"
+            "Pkly\\I18Next\\": "src/I18Next"
         }
     }
 }
