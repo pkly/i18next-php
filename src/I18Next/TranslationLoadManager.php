@@ -169,7 +169,7 @@ class TranslationLoadManager {
     public function prepareLoading($languages, $namespaces, array $options = []) {
         if ($this->_loader === null) {
             $this->_logger->warning('No loader was added via i18next.useModule. Will not load resources.');
-            return;
+            return false;
         }
 
         if (is_string($languages))
@@ -178,7 +178,19 @@ class TranslationLoadManager {
         if (is_string($namespaces))
             $namespaces = [$namespaces];
 
+        $toLoad = $this->queueLoad($languages, $namespaces, $options);
+        if (!count($toLoad['toLoad'])) {
+            if (!count($toLoad['pending']))
+                return true;
 
+            return null;
+        }
+
+        foreach ($toLoad['toLoad'] as $name) {
+            $this->loadOne($name);
+        }
+
+        return true;
     }
 
     public function load($languages, $namespaces) {
@@ -203,5 +215,9 @@ class TranslationLoadManager {
             $this->_logger->warning($prefix . 'Loading namespace ' . $ns . ' for language '. $lng . ' failed', (array)$e);
             $this->_state[$name] = -1;
         }
+    }
+
+    public function saveMissing($languages, $namespace, $key, $fallbackValue, bool $isUpdate = false, array $options = []) {
+        // TODO: implement
     }
 }
