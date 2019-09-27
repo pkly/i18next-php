@@ -119,6 +119,39 @@ class TranslationLoadManager {
         }
 
         $this->_state[$name] = 2;
+
+        $loaded = [];
+
+        $remove = function(&$arr, $what) {
+            while (($pos = array_search($what, $arr)) !== false) {
+                unset($what[$pos]);
+            }
+        };
+
+        foreach ($this->_queue as &$q) {
+            Utils\pushPath($q['loaded'], [$lng], $ns);
+            $remove($q['pending'], $name);
+
+            if (count($q['pending']) === 0 && !$q['done'] ?? false) {
+                foreach ($q as $l => $v) {
+                    if (!array_key_exists($l, $loaded))
+                        $loaded[$l] = [];
+
+                    foreach ($q['loaded'][$l] ?? [] as $ns) {
+                        if (!in_array($ns, $loaded[$l]))
+                            $loaded[$l][] = $ns;
+                    }
+                }
+            }
+
+            $q['done'] = true;
+        }
+
+        // event emit consolidated loaded event
+
+        $this->_queue = array_filter($this->_queue, function($o) {
+            return $o['done'] ?? false;
+        });
     }
 
     public function read($lng, $ns, $fcName) {

@@ -159,7 +159,7 @@ function setPath(&$object, $path, $newValue) {
     $obj[$key] = $newValue;
 }
 
-function pushPath(&$object, $path, $newValue, bool $concat) {
+function pushPath(&$object, $path, $newValue, bool $concat = false) {
     list(&$obj, $key) = getLastOfPath($object, $path, []);
 
     $obj[$key] = $obj[$key] ?? [];
