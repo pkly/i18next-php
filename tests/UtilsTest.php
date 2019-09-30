@@ -52,4 +52,22 @@ class UtilsTest extends TestCase {
         $this->assertEquals('val2', Utils\getPath($data, ['deep', 'here']));
         $this->assertNull(Utils\getPath($data, 'notrealkey'));
     }
+
+    /**
+     * @depends testGetPath
+     * @depends testSetPath
+     */
+    public function testPushPath() {
+        $data1 = [
+            'normal'        =>  [],
+            'deep'          =>  [
+                'here'      =>  'val2'
+            ]
+        ];
+        $copy = $data1;
+
+        Utils\pushPath($copy, 'normal', 'val1');
+        $data1['normal'] = ['val1'];
+        $this->assertEquals($data1, $copy);
+    }
 }
