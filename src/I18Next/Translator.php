@@ -220,7 +220,7 @@ class Translator {
                 $res = $namespace . ':' . $key;
 
             // parseMissingKeyHandler
-            if ($usedKey && isset($this->_options['parseMissingKeyHandler'])) {
+            if ($usedKey && is_callable($this->_options['parseMissingKeyHandler'] ?? null)) {
                 $res = call_user_func($this->_options['parseMissingKeyHandler'], $res);
             }
         }
