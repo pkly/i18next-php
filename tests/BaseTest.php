@@ -18,7 +18,7 @@ class BaseTest extends TestCase {
             'debug'         =>  true
         ]);
 
-        echo $i18n->t('test');
+        echo $i18n->t('test.key');
 
         //$this->assertEquals('Hello world!', I18n::get()->t('key'));
     }
