@@ -10,6 +10,8 @@ namespace Pkly\I18Next;
 
 use Psr\Log\LoggerInterface;
 
+require_once __DIR__ . '/Utils.php';
+
 class Translator {
     /**
      * @var array

@@ -8,6 +8,8 @@
 
 namespace Pkly\I18Next;
 
+require_once __DIR__ . '/Utils.php';
+
 class ResourceStore implements \JsonSerializable {
     private $_data                              =   [];
     private $_options                           =   [];

@@ -8,6 +8,8 @@
 
 namespace Pkly\I18Next;
 
+require_once __DIR__ . '/Utils.php';
+
 class LanguageUtil {
     private $_options                           =   [];
     private $_whitelist                         =   false;

@@ -8,7 +8,24 @@
 
 namespace Pkly\I18Next;
 
+use Psr\Log\LoggerInterface;
+
 class Loader implements ModuleInterface {
+    /**
+     * @var array
+     */
+    protected $_options                         =   [];
+
+    /**
+     * @var LoggerInterface|null
+     */
+    protected $_logger                          =   null;
+
+    /**
+     * @var I18n|null
+     */
+    protected $_i18n                            =   null;
+
     /**
      * @inheritDoc
      */
@@ -27,7 +44,9 @@ class Loader implements ModuleInterface {
      * @inheritDoc
      */
     public function init(&$services, array $options, I18n &$instance): void {
-        return;
+        $this->_options = $options;
+        $this->_i18n = &$instance;
+        $this->_logger = &$services->_logger;
     }
 
     public function create($languages, $namespace, $key, $fallbackValue, array $options = [], $isUpdate = false) {

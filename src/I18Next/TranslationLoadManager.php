@@ -10,6 +10,8 @@ namespace Pkly\I18Next;
 
 use Psr\Log\LoggerInterface;
 
+require_once __DIR__ . '/Utils.php';
+
 class TranslationLoadManager {
     /**
      * @var array
@@ -163,7 +165,7 @@ class TranslationLoadManager {
             return null;
         }
 
-        return $this->_logger->{$fcName}($lng, $ns);
+        return $this->_loader->{$fcName}($lng, $ns);
     }
 
     public function prepareLoading($languages, $namespaces, array $options = []) {
