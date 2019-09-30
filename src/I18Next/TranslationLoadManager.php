@@ -48,7 +48,7 @@ class TranslationLoadManager {
      */
     private $_state                             =   [];
 
-    public function __construct(Loader &$loader, ResourceStore &$store, &$services, array $options = []) {
+    public function __construct(?Loader &$loader, ResourceStore &$store, &$services, array $options = []) {
         $this->_loader = &$loader;
         $this->_store = &$store;
         $this->_options = $options;

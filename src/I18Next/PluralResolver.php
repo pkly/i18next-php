@@ -210,7 +210,7 @@ function createRules() {
     $rules = [];
     $rPluralTypes = getRulesForPluralTypes();
     foreach (SETS as $set) {
-        foreach ($set['lng'] as $l) {
+        foreach ($set['lngs'] as $l) {
             $rules[$l] = [
                 'numbers'   =>  $set['nr'],
                 'plurals'   =>  $rPluralTypes[$set['fc']]

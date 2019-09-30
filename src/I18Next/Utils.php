@@ -52,13 +52,13 @@ function getDefaults() {
         'overloadTranslationOptionHandler'      =>  function (...$args) {
             $ret = [];
 
-            if (is_array($args[1]))
+            if (is_array($args[1] ?? null))
                 $ret = $args[1];
-            if (is_string($args[1]))
+            if (is_string($args[1] ?? null))
                 $ret['defaultValue'] = $args[1];
-            if (is_string($args[2]))
+            if (is_string($args[2] ?? null))
                 $ret['tDescription'] = $args[2];
-            if (is_array($args[2]) || is_array($args[3])) {
+            if (is_array($args[2] ?? null) || is_array($args[3] ?? null)) {
                 $options = $args[3] ?? $args[2];
                 foreach ($options as $key => $option) {
                     $ret[$key] = $option;

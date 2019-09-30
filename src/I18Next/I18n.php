@@ -96,6 +96,11 @@ class I18n implements LoggerAwareInterface {
     /**
      * @var TranslationLoadManager|null
      */
+    private $_translationLoadManager            =   null;
+
+    /**
+     * @var Loader|null
+     */
     private $_loader                            =   null;
 
     /**
@@ -133,7 +138,7 @@ class I18n implements LoggerAwareInterface {
         $this->_format = $this->_options['interpolation']['format'];
 
         // init services
-        if (!$this->_options['isClone']) {
+        if (!($this->_options['isClone'] ?? false)) {
             $this->_store = new ResourceStore($this->_options['resources'] ?? [], $this->_options);
 
             $this->_services->_logger = &$this->_logger;
@@ -141,13 +146,12 @@ class I18n implements LoggerAwareInterface {
             $this->_services->_languageUtils = new LanguageUtil($this->_options);
             $this->_services->_pluralResolver = new PluralResolver($this->_services->_languageUtils, [
                 'prepend'               =>  $this->_options['pluralSeparator'],
-                'compatibilityJSON'     =>  $this->_options['compatibilityJSON'],
                 'simplifyPluralSuffix'  =>  $this->_options['simplifyPluralSuffix']
             ]);
             $this->_services->_interpolator = new Interpolator($this->_options, $this->_logger);
 
-            $this->_loader = new TranslationLoadManager($this->_store, $this->_services, $this->_options);
-            $this->_services->_loader = &$this->_loader;
+            $this->_translationLoadManager = new TranslationLoadManager($this->_loader, $this->_store, $this->_services, $this->_options);
+            $this->_services->_translationLoadManager = &$this->_translationLoadManager;
 
             // TODO: look over the module loading code from ( https://github.com/i18next/i18next/blob/master/src/i18next.js#L86 )
 
@@ -193,7 +197,7 @@ class I18n implements LoggerAwareInterface {
             if ($this->_options['preload'] && is_array($this->_options['preload']))
                 array_map($append, $this->_options['preload']);
 
-            $this->_loader->load($toLoad, $this->_options['ns']);
+            $this->_translationLoadManager->load($toLoad, $this->_options['ns']);
         }
     }
 
@@ -204,7 +208,7 @@ class I18n implements LoggerAwareInterface {
         if (!$ns)
             $ns = $this->_options['ns'];
 
-        $this->_loader->reload($lngs, $ns);
+        $this->_translationLoadManager->reload($lngs, $ns);
     }
 
     /**
@@ -228,6 +232,10 @@ class I18n implements LoggerAwareInterface {
 
         if ($module->getModuleType() === MODULE_TYPE_EXTERNAL) {
             $this->_modules['external'][] = &$module;
+        }
+
+        if ($module->getModuleType() === MODULE_TYPE_LOADER) {
+            $this->_loader = &$module;
         }
 
         return $this;
