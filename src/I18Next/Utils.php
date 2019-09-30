@@ -207,7 +207,7 @@ function capitalize(string $str): string {
 }
 
 function regexEscape(string $str): string {
-    return preg_replace("/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g", "\\$&", $str);
+    return preg_replace("/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/", "\\$&", $str);
 }
 
 const ENTITY_MAP = [

@@ -12,19 +12,14 @@ use PHPUnit\Framework\TestCase;
 use Pkly\I18Next\I18n;
 
 class BaseTest extends TestCase {
-    public function testBasic() {
-        I18n::get([
-            'lng'           =>  'en',
-            'debug'         =>  true,
-            'resources'     =>  [
-                'en'        =>  [
-                    'translation'       =>  [
-                        'key'           =>  'Hello world!'
-                    ]
-                ]
-            ]
+    public function testCIMode() {
+        $i18n = new I18n([
+            'lng'           =>  'cimode',
+            'debug'         =>  true
         ]);
 
-        $this->assertEquals('Hello world!', I18n::get()->t('key'));
+        echo $i18n->t('test');
+
+        //$this->assertEquals('Hello world!', I18n::get()->t('key'));
     }
 }

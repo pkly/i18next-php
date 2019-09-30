@@ -11,6 +11,8 @@ namespace Pkly\I18Next;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
+require_once __DIR__ . '/Utils.php';
+
 class Interpolator {
     /**
      * @var array
@@ -105,6 +107,7 @@ class Interpolator {
             $logger = new NullLogger();
 
         $this->_logger = $logger;
+        $this->init($options);
     }
 
     public function init(array $options = []) {
@@ -115,7 +118,7 @@ class Interpolator {
 
         $iOpts = $options['interpolation'];
 
-        $this->_escape = $iOpts['escape'] ?? \Closure::fromCallable('\I18Next\Utils\escape');
+        $this->_escape = $iOpts['escape'] ?? \Closure::fromCallable('\Pkly\I18Next\Utils\escape');
         $this->_escapeValue = $iOpts['escapeValue'] ?? true;
         $this->_useRawValueToEscape = $iOpts['useRawValueToEscape'] ?? false;
 
@@ -152,7 +155,7 @@ class Interpolator {
         $combinedData = array_merge($defaultData, $data);
 
         $regexSafe = function($v) {
-            return preg_replace('/\$/g', '$$$$', $v);
+            return preg_replace('/\$/', '$$$$', $v);
         };
 
         $handleFormat = function($key) use (&$combinedData, $lng) {
@@ -199,7 +202,9 @@ class Interpolator {
 
             if ($replaces >= $this->_maxReplaces)
                 break;
-        } while (!empty($matches));
+        } while (!empty($match));
+
+
 
         $match = [];
         $replaces = 0;
@@ -231,7 +236,7 @@ class Interpolator {
 
             if ($replaces >= $this->_maxReplaces)
                 break;
-        } while (!empty($matches));
+        } while (!empty($match));
 
         return $str;
     }
