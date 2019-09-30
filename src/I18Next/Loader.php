@@ -10,6 +10,8 @@ namespace Pkly\I18Next;
 
 use Psr\Log\LoggerInterface;
 
+require_once __DIR__ . '/Utils.php';
+
 class Loader implements ModuleInterface {
     /**
      * @var array
@@ -25,6 +27,11 @@ class Loader implements ModuleInterface {
      * @var I18n|null
      */
     protected $_i18n                            =   null;
+
+    /**
+     * @var \stdClass|null
+     */
+    protected $_services                        =   null;
 
     /**
      * @inheritDoc
@@ -44,16 +51,13 @@ class Loader implements ModuleInterface {
      * @inheritDoc
      */
     public function init(&$services, array $options, I18n &$instance): void {
-        $this->_options = $options;
+        $this->_options = array_merge_recursive($options, Utils\getDefaults());
         $this->_i18n = &$instance;
         $this->_logger = &$services->_logger;
+        $this->_services = &$services;
     }
 
-    public function create($languages, $namespace, $key, $fallbackValue, array $options = [], $isUpdate = false) {
+    public function create($languages, $namespace, $key, $fallbackValue, array $options = [], $isUpdate = false) {}
 
-    }
-
-    public function read($language, $namespace) {
-
-    }
+    public function read($language, $namespace) {}
 }
