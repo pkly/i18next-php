@@ -120,21 +120,23 @@ function copy($search, &$from, &$to) {
     }
 }
 
-function getLastOfPath(&$object, $path, $Empty = null) {
+function &getLastOfPath(&$object, $path, $Empty = null) {
     $cleanKey = function ($key) {
         return $key && mb_strpos($key, '###') !== false ? str_replace('###', '.', $key) : $key;
     };
 
+    $ret = [];
+
     $obj = &$object;
 
-    $canNotTraverseDeeper = function () use ($obj) {
+    $canNotTraverseDeeper = function () use (&$obj) {
         return $obj === null || is_string($obj);
     };
 
     $stack = is_array($path) ? $path : explode('.', $path);
     while (count($stack) > 1) {
         if ($canNotTraverseDeeper())
-            return [];
+            return $ret;
 
         $key = $cleanKey(array_shift($stack));
         if (!isset($obj[$key]) && $Empty !== null) {
@@ -145,12 +147,14 @@ function getLastOfPath(&$object, $path, $Empty = null) {
     }
 
     if ($canNotTraverseDeeper())
-        return [];
+        return $ret;
 
-    return [
+    $ret = [
         &$obj,
         $cleanKey(array_shift($stack))
     ];
+
+    return $ret;
 }
 
 function setPath(&$object, $path, $newValue) {
@@ -176,7 +180,7 @@ function getPath(&$object, $path) {
     if (!isset($obj))
         return null;
 
-    return $obj[$key];
+    return $obj[$key] ?? null;
 }
 
 function deepMerge(array $target, array $source, bool $overwrite = false) {

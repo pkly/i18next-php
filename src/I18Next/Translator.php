@@ -290,6 +290,7 @@ class Translator {
             foreach ($namespaces as $ns) {
                 if ($this->isValidLookup($found))
                     break;
+
                 $usedNS = $ns;
 
                 foreach ($codes as $code) {
@@ -302,7 +303,7 @@ class Translator {
                     $finalKeys = [$finalKey];
 
                     if ($this->_i18nFormat !== null && is_callable([$this->_i18nFormat, 'addLookupKeys'])) {
-                        $this->_i18nFormat->addLookupKeys($finalKeys, $key, $code, $ns, $options);
+                        call_user_func([$this->_i18nFormat, 'addLookupKeys'], $finalKeys, $key, $code, $ns, $options);
                     }
                     else {
                         $pluralSuffix = '';
