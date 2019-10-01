@@ -28,4 +28,23 @@ class BaseTest extends TestCase {
 
         $this->assertEquals('translation:test.key', $i18nWithCiModeNamespace->t('test.key'));
     }
+
+    /**
+     * @depends testCIMode
+     */
+    public function testNormalUsage() {
+        $i18n = new I18n([
+            'lng'           =>  'en',
+            'debug'         =>  true,
+            'resources'     =>  [
+                'en'        =>  [
+                    'translation'       =>  [
+                        'key'           =>  'value'
+                    ]
+                ]
+            ]
+        ]);
+
+        $this->assertEquals('value', $i18n->t('key'));
+    }
 }

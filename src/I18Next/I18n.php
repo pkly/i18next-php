@@ -41,6 +41,14 @@ const STORE_API = [
  * To use either create a new instance yourself, or simply initialize it globally via I18n::get() (suggested)
  *
  * @package Pkly\I18Next
+ * @method mixed getResource(string $lng, string $ns, $key = null, array $options = [])
+ * @method void addResource(string $lng, $ns, $key, $value, array $options = ['silent' => false])
+ * @method void addResources(string $lng, $ns, array $resources, array $options = ['silent' => false])
+ * @method void addResourceBundle(string $lng, $ns, $resources, bool $deep = false, bool $overwrite = false, array $options = ['silent' => false])
+ * @method void removeResourceBundle(string $lng, string $ns)
+ * @method bool hasResourceBundle(string $lng, string $ns)
+ * @method mixed getResourceBundle(string $lng, ?string $ns = null)
+ * @method mixed getDataByLanguage(string $lng)
  */
 class I18n implements LoggerAwareInterface {
     /**

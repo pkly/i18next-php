@@ -335,7 +335,10 @@ class Translator {
                             break;
 
                         $exactUsedKey = $possibleKey;
-                        $found = $this->getResource($code, $ns, $possibleKey, $options);
+                        $f = $this->getResource($code, $ns, $possibleKey, $options);
+
+                        if ($f !== null)
+                            $found = $f;
                     }
                 }
             }
@@ -353,8 +356,8 @@ class Translator {
     public function isValidLookup($res) {
         // In JS this includes an undefined check, but in PHP there's no such thing, so we're creating an stdClass instead, great I know.
         return !($res instanceof \stdClass) &&
-            !($this->_options['returnNull'] ?? false && $res === null) &&
-            !($this->_options['returnEmptyString'] ?? false && $res === '');
+            !(!($this->_options['returnNull'] ?? true) && $res === null) &&
+            !(!($this->_options['returnEmptyString'] ?? true) && $res === '');
     }
 
     public function getResource($code, $ns, $key, array $options = []) {
