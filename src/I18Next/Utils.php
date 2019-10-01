@@ -97,7 +97,43 @@ function transformOptions(?array $options = null) {
     return $options;
 }
 
-function noop(...$args) {}
+/**
+ * array_merge_recursive does indeed merge arrays, but it converts values with duplicate
+ * keys to arrays rather than overwriting the value in the first array with the duplicate
+ * value in the second array, as array_merge does. I.e., with array_merge_recursive,
+ * this happens (documented behavior):
+ *
+ * @return array
+ * @author Daniel <daniel (at) danielsmedegaardbuus (dot) dk>
+ * @author Gabriel Sobrinho <gabriel (dot) sobrinho (at) gmail (dot) com>
+ * @author Pkly [Support more than 2 arrays at a time]
+ */
+function arrayMergeRecursiveDistinct(...$args) {
+    $merge = function(&$a, &$b) use (&$merge) {
+        $merged = $a;
+
+        foreach ($b as $key => &$value) {
+            if (is_array($value) && isset($merged[$key]) && is_array($merged[$key]))
+                $merged[$key] = $merge($merged[$key], $value);
+            else
+                $merged[$key] = $value;
+        }
+
+        return $merged;
+    };
+
+    if (count($args) < 2)
+        return $args[0];
+
+    $data = $merge($args[0], $args[1]);
+    if (count($args) === 2)
+        return $data;
+
+    for ($i = 2; $i < count($args); $i++)
+        $data = $merge($data, $args[$i]);
+
+    return $data;
+}
 
 function copy($search, &$from, &$to) {
     foreach ($search as $searchKey) {

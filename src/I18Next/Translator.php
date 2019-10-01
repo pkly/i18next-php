@@ -81,6 +81,10 @@ class Translator {
             $this->_language = $lng;
     }
 
+    public function getLanguage(): string {
+        return $this->_language;
+    }
+
     public function exists(string $key, array $options = ['interpolation' => []]): bool {
         $resolved = $this->resolve($key, $options);
         return $resolved && !($resolved['res'] instanceof \stdClass);

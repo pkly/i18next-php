@@ -133,7 +133,7 @@ class I18n implements LoggerAwareInterface {
     }
 
     public function init(array $options = []) {
-        $this->_options = array_merge_recursive(Utils\getDefaults(), $this->_options, Utils\transformOptions($options));
+        $this->_options = Utils\arrayMergeRecursiveDistinct(Utils\getDefaults(), $this->_options, Utils\transformOptions($options));
 
         $this->_format = $this->_options['interpolation']['format'];
 
@@ -158,19 +158,21 @@ class I18n implements LoggerAwareInterface {
             $this->_translator = new Translator($this->_services, $this->_options);
 
             // TODO: Possibly init modules?
-
-            // append api
-            foreach (STORE_API as $fcName) {
-                unset($this->{$fcName});
-                $this->{$fcName} = function (...$args) use ($fcName) {
-                    return call_user_func([$this->_store, $fcName], ...$args);
-                };
-            }
         }
+
+        // append api
+        foreach (STORE_API as $fcName) {
+            unset($this->{$fcName});
+            $this->{$fcName} = function (...$args) use ($fcName) {
+                return call_user_func([$this->_store, $fcName], ...$args);
+            };
+        }
+
+        $this->changeLanguage($this->_options['lng']);
     }
 
     public function loadResources() {
-        if (!$this->_options['resources'] ?? false || $this->_options['partialBundledLanguages']) {
+        if (!isset($this->_options['resources']) || $this->_options['partialBundledLanguages']) {
             if ($this->_language && mb_strtolower($this->_language) === 'cimode')
                 return; // avoid loading resources for cimode
 
@@ -242,7 +244,28 @@ class I18n implements LoggerAwareInterface {
     }
 
     public function changeLanguage(string $lng) {
+        $setLng = function ($l) {
+            if ($l) {
+                $this->_language = $l;
+                $this->_languages = $this->_services->_languageUtils->toResolveHierarchy($l);
 
+                if (!$this->_translator->getLanguage())
+                    $this->_translator->changeLanguage($l);
+
+                // TODO: Language detector, cache user language
+            }
+
+            $this->loadResources();
+
+            $this->_translator->changeLanguage($l);
+            $this->_logger->info('Language changed', ['language' => $l]);
+        };
+
+        // In JS this also has an async check, but no such thing is available or really required in PHP
+        if (!$lng && isset($this->_services->_languageDetector))
+            $setLng($this->_services->_languageDetector->detect());
+        else
+            $setLng($lng);
     }
 
     /**

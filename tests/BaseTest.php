@@ -18,8 +18,14 @@ class BaseTest extends TestCase {
             'debug'         =>  true
         ]);
 
-        echo $i18n->t('test.key');
+        $this->assertEquals('test.key', $i18n->t('test.key'));
 
-        //$this->assertEquals('Hello world!', I18n::get()->t('key'));
+        $i18nWithCiModeNamespace = new I18n([
+            'lng'           =>  'cimode',
+            'debug'         =>  true,
+            'appendNamespaceToCIMode'   =>  true
+        ]);
+
+        $this->assertEquals('translation:test.key', $i18nWithCiModeNamespace->t('test.key'));
     }
 }

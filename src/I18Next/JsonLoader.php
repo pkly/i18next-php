@@ -27,7 +27,7 @@ class JsonLoader extends Loader {
 
     public function init(&$services, array $options, I18n &$instance): void {
         parent::init($services, $options, $instance);
-        $this->_options = array_merge_recursive($this->_options, self::getDefaults());
+        $this->_options = Utils\arrayMergeRecursiveDistinct($this->_options, self::getDefaults());
 
         if (!isset($options['json_resource_path'])) {
             $this->_logger->error('No resource path was found for the JsonLoader instance', $options);
