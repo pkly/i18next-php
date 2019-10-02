@@ -56,6 +56,11 @@ class TranslationLoadManager {
         $this->_logger = &$services->_logger;
     }
 
+    public function setLoader(?Loader &$loader) {
+        $this->_loader = &$loader;
+        return $this;
+    }
+
     public function queueLoad(array $languages, array $namespaces, array $options = []) {
         $toLoad = [];
         $pending = [];
@@ -68,7 +73,7 @@ class TranslationLoadManager {
             foreach ($namespaces as $ns) {
                 $name = $lng . '|' . $ns;
 
-                if (!$options['reload'] ?? false && $this->_store->hasResourceBundle($lng, $ns)) {
+                if (!($options['reload'] ?? false) && $this->_store->hasResourceBundle($lng, $ns)) {
                     $this->_state[$name] = 2; // loaded
                 }
                 else if ($this->_state[$name] ?? 0 < 0) {

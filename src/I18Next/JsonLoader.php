@@ -16,8 +16,7 @@ class JsonLoader extends Loader {
 
     public static function getDefaults(): array {
         return [
-            'parse'             =>  '\json_decode',
-            'json_root_path'    =>  ''
+            'parse'             =>  '\json_decode'
         ];
     }
 
@@ -27,9 +26,9 @@ class JsonLoader extends Loader {
 
     public function init(&$services, array $options, I18n &$instance): void {
         parent::init($services, $options, $instance);
-        $this->_options = Utils\arrayMergeRecursiveDistinct($this->_options, self::getDefaults());
+        $this->_options = Utils\arrayMergeRecursiveDistinct(self::getDefaults(), $this->_options);
 
-        if (!isset($options['json_resource_path'])) {
+        if (!isset($this->_options['json_resource_path'])) {
             $this->_logger->error('No resource path was found for the JsonLoader instance', $options);
             return;
         }
@@ -43,6 +42,7 @@ class JsonLoader extends Loader {
          */
         $interpolator = &$this->_services->_interpolator;
         $path = $interpolator->interpolate($this->_filePath, ['lng' => $language, 'ns' => $namespace]);
+        // TODO: Check why interpolation here is failing
 
         return $this->load($path);
     }

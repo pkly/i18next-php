@@ -51,7 +51,7 @@ class Loader implements ModuleInterface {
      * @inheritDoc
      */
     public function init(&$services, array $options, I18n &$instance): void {
-        $this->_options = Utils\arrayMergeRecursiveDistinct($options, Utils\getDefaults());
+        $this->_options = Utils\arrayMergeRecursiveDistinct(Utils\getDefaults(), $options);
         $this->_i18n = &$instance;
         $this->_logger = &$services->_logger;
         $this->_services = &$services;

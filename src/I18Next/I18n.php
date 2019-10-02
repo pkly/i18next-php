@@ -140,9 +140,11 @@ class I18n implements LoggerAwareInterface {
         return $this;
     }
 
-    public function init(array $options = []) {
-        $this->_options = Utils\arrayMergeRecursiveDistinct(Utils\getDefaults(), $this->_options, Utils\transformOptions($options));
+    public function init(?array $options = null) {
+        if ($options === null)
+            $options = $this->_options;
 
+        $this->_options = Utils\arrayMergeRecursiveDistinct(Utils\getDefaults(), $this->_options, Utils\transformOptions($options));
         $this->_format = $this->_options['interpolation']['format'];
 
         // init services
@@ -161,11 +163,13 @@ class I18n implements LoggerAwareInterface {
             $this->_translationLoadManager = new TranslationLoadManager($this->_loader, $this->_store, $this->_services, $this->_options);
             $this->_services->_translationLoadManager = &$this->_translationLoadManager;
 
-            // TODO: look over the module loading code from ( https://github.com/i18next/i18next/blob/master/src/i18next.js#L86 )
+            if (isset($this->_modules['languageDetector'])) {
+                $this->_modules['languageDetector']->init($this->_services, $this->_options, $this);
+            }
 
             $this->_translator = new Translator($this->_services, $this->_options);
 
-            // TODO: Possibly init modules?
+            // TODO: Init external modules here
         }
 
         // append api
@@ -246,6 +250,12 @@ class I18n implements LoggerAwareInterface {
 
         if ($module->getModuleType() === MODULE_TYPE_LOADER) {
             $this->_loader = &$module;
+            $this->_loader->init($this->_services, $this->_options, $this);
+
+            if ($this->_translationLoadManager !== null)
+                $this->_translationLoadManager->setLoader($this->_loader);
+
+            $this->loadResources();
         }
 
         return $this;
