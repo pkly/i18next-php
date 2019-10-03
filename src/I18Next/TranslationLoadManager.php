@@ -306,6 +306,13 @@ class TranslationLoadManager {
      * @param array $options
      */
     public function saveMissing($languages, $namespace, $key, $fallbackValue, bool $isUpdate = false, array $options = []) {
-        // TODO: implement
+        if ($this->_loader !== null)
+            $this->_loader->create($languages, $namespace, $key, $fallbackValue, $options, $isUpdate);
+
+        // write to store to avoid resending
+        if (!isset($languages[0]))
+            return;
+
+        $this->_store->addResource($languages[0], $namespace, $key, $fallbackValue);
     }
 }

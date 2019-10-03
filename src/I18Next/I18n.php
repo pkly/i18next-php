@@ -386,9 +386,52 @@ class I18n implements LoggerAwareInterface {
         $this->_options['defaultNS'] = [$ns];
     }
 
-    // TODO: loadNamespaces
+    /**
+     * Load namespaces
+     *
+     * @param string|string[] $ns
+     */
+    public function loadNamespaces($ns) {
+        if (is_string($ns))
+            $ns = [$ns];
 
-    // TODO: loadLanguages
+        if (!is_array($ns)) {
+            $this->_logger->warning('Invalid parameter passed to loadNamespaces', ['ns' => $ns]);
+            return;
+        }
+
+        foreach ($ns as $n)
+            if (!in_array($n, $this->_options['ns']))
+                $this->_options['ns'][] = $n;
+
+        $this->loadResources();
+    }
+
+    /**
+     * Load languages
+     *
+     * @param string|string[] $lngs
+     */
+    public function loadLanguages($lngs) {
+        if (is_string($lngs))
+            $lngs = [$lngs];
+
+        if (!is_array($lngs)) {
+            $this->_logger->warning('Invalid parameter passed to loadLanguages', ['lngs' => $lngs]);
+            return;
+        }
+
+        $preloaded = $this->_options['preload'] ?? [];
+        $newLngs = array_filter($lngs, function($l) use ($preloaded) {
+            return !in_array($l, $preloaded);
+        });
+
+        if (!count($newLngs))
+            return;
+
+        $this->_options['preload'] = array_merge($preloaded, $newLngs);
+        $this->loadResources();
+    }
 
     /**
      * Get text direction
