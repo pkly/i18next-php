@@ -8,6 +8,9 @@
 
 namespace Pkly\I18Next;
 
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+
 require_once __DIR__ . '/Utils.php';
 
 /**
@@ -33,14 +36,24 @@ class LanguageUtil {
     private $_whitelist                         =   false;
 
     /**
+     * @var LoggerInterface|null
+     */
+    private $_logger                            =   null;
+
+    /**
      * LanguageUtil constructor.
      *
      * @param array $options
      */
-    public function __construct(array $options = []) {
+    public function __construct(array $options = [], ?LoggerInterface $logger = null) {
         $this->_options = $options;
 
         $this->_whitelist = $this->_options['whitelist'] ?? false;
+
+        if ($logger === null)
+            $logger = new NullLogger();
+
+        $this->_logger = $logger;
     }
 
     /**
@@ -185,8 +198,8 @@ class LanguageUtil {
 
             if ($this->isWhitelisted($c))
                 $codes[] = $c;
-            // else
-                // logger here "rejecting non-whitelisted language code $c"
+            else
+                $this->_logger->warning('Rejecting non-whitelisted language code', ['lng' => $c]);
         };
 
         if (is_string($code) && mb_strpos($code, '-') !== false) {

@@ -173,7 +173,7 @@ class I18n implements LoggerAwareInterface {
 
             $this->_services->_logger = &$this->_logger;
             $this->_services->_resourceStore = &$this->_store;
-            $this->_services->_languageUtils = new LanguageUtil($this->_options);
+            $this->_services->_languageUtils = new LanguageUtil($this->_options, $this->_logger);
             $this->_services->_pluralResolver = new PluralResolver($this->_services->_languageUtils, [
                 'prepend'               =>  $this->_options['pluralSeparator'],
                 'simplifyPluralSuffix'  =>  $this->_options['simplifyPluralSuffix']
