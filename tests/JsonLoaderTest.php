@@ -28,5 +28,6 @@ class JsonLoaderTest extends TestCase {
         $this->assertEquals('value from json!', $i18n->t('key'));
         $this->assertEquals('another json value', $i18n->t('second_key'));
         $this->assertEquals('key', $i18n->t('another_ns:key'));
+        $this->assertEquals('value from deep!', $i18n->t('third_key.deep'));
     }
 }
