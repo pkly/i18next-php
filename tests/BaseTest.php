@@ -39,12 +39,16 @@ class BaseTest extends TestCase {
             'resources'     =>  [
                 'en'        =>  [
                     'translation'       =>  [
-                        'key'           =>  'value'
+                        'key'           =>  'value',
+                        'deep'          =>  [
+                            'key'       =>  'value2'
+                        ]
                     ]
                 ]
             ]
         ]);
 
         $this->assertEquals('value', $i18n->t('key'));
+        $this->assertEquals('value2', $i18n->t('deep.key'));
     }
 }
