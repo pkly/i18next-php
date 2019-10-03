@@ -13,6 +13,13 @@ use Psr\Log\NullLogger;
 
 require_once __DIR__ . '/Utils.php';
 
+/**
+ * Class Interpolator
+ *
+ * Used for interpolating variables and arrays into strings
+ *
+ * @package Pkly\I18Next
+ */
 class Interpolator {
     /**
      * @var array
@@ -99,6 +106,12 @@ class Interpolator {
      */
     private $_nestingRegexp                     =   '';
 
+    /**
+     * Interpolator constructor.
+     *
+     * @param array $options
+     * @param LoggerInterface|null $logger
+     */
     public function __construct(array $options = [], ?LoggerInterface $logger = null) {
         $this->_options = $options;
         $this->_format = $options['interpolation']['format'] ?? function ($value, $format, $lng) { return $value; };
@@ -110,13 +123,18 @@ class Interpolator {
         $this->init($options);
     }
 
+    /**
+     * Initialize or re-initialize the interpolator
+     *
+     * @param array $options
+     */
     public function init(array $options = []) {
         if (!isset($options['interpolation']))
             $options['interpolation'] = [
                 'escapeValue'       =>  true
             ];
 
-        $iOpts = $options['interpolation'];
+        $iOpts = $options['interpolation'] ?? [];
 
         $this->_escape = $iOpts['escape'] ?? \Closure::fromCallable('\Pkly\I18Next\Utils\escape');
         $this->_escapeValue = $iOpts['escapeValue'] ?? true;
@@ -138,17 +156,32 @@ class Interpolator {
         $this->resetRegExp();
     }
 
+    /**
+     * Reset all changes
+     */
     public function reset() {
         if ($this->_options)
             $this->init($this->_options);
     }
 
+    /**
+     * Reset regular expressions used for interpolation
+     */
     public function resetRegExp() {
         $this->_regexp = '/' . $this->_prefix . '(.+?)' . $this->_suffix . '/';
         $this->_regexpUnescape = '/' . $this->_prefix . $this->_unescapePrefix . '(.+?)' . $this->_unescapeSuffix . $this->_suffix . '/';
         $this->_nestingRegexp = '/' . $this->_nestingPrefix . '(.+?)' . $this->_nestingSuffix . '/';
     }
 
+    /**
+     * Interpolate variables into a string
+     *
+     * @param string $str
+     * @param $data
+     * @param null $lng
+     * @param array $options
+     * @return string
+     */
     public function interpolate(string $str, $data, $lng = null, array $options = []): string {
         $defaultData = $this->_options['interpolation']['defaultVariables'] ?? [];
 
@@ -241,10 +274,17 @@ class Interpolator {
         return $str;
     }
 
+    /**
+     * Interpolate nested variables into a string
+     *
+     * @param string $str
+     * @param callable $fc
+     * @param array $options
+     * @return mixed|string
+     */
     public function nest(string $str, callable $fc, array $options = []) {
         $clonedOptions = $options;
         $clonedOptions['applyPostProcessor'] = false;
-
 
         $handleHasOptions = function (string $key, array $inheritedOptions) use (&$clonedOptions) {
             if (mb_strpos($key, ',') === false)

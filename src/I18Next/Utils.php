@@ -8,6 +8,11 @@
 
 namespace Pkly\I18Next\Utils;
 
+/**
+ * Get default variables for initializing the I18n object
+ *
+ * @return array
+ */
 function getDefaults() {
     return [
         /* Logging */
@@ -84,6 +89,12 @@ function getDefaults() {
     ];
 }
 
+/**
+ * Fix options that are supposed to be arrays
+ *
+ * @param array|null $options
+ * @return array|null
+ */
 function transformOptions(?array $options = null) {
     if (is_string($options['ns'] ?? null))
         $options['ns'] = [$options['ns']];
@@ -135,6 +146,13 @@ function arrayMergeRecursiveDistinct(...$args) {
     return $data;
 }
 
+/**
+ * Copy items from one object/array to another
+ *
+ * @param $search
+ * @param $from
+ * @param $to
+ */
 function copy($search, &$from, &$to) {
     foreach ($search as $searchKey) {
         if (is_object($from)) {
@@ -156,6 +174,14 @@ function copy($search, &$from, &$to) {
     }
 }
 
+/**
+ * Traverse an array and return the last possible object and key
+ *
+ * @param $object
+ * @param $path
+ * @param null $Empty
+ * @return array
+ */
 function &getLastOfPath(&$object, $path, $Empty = null) {
     $cleanKey = function ($key) {
         return $key && mb_strpos($key, '###') !== false ? str_replace('###', '.', $key) : $key;
@@ -193,12 +219,27 @@ function &getLastOfPath(&$object, $path, $Empty = null) {
     return $ret;
 }
 
+/**
+ * Modify path of array
+ *
+ * @param $object
+ * @param $path
+ * @param $newValue
+ */
 function setPath(&$object, $path, $newValue) {
     list(&$obj, $key) = getLastOfPath($object, $path, []);
 
     $obj[$key] = $newValue;
 }
 
+/**
+ * Add to path of array
+ *
+ * @param $object
+ * @param $path
+ * @param $newValue
+ * @param bool $concat
+ */
 function pushPath(&$object, $path, $newValue, bool $concat = false) {
     list(&$obj, $key) = getLastOfPath($object, $path, []);
 
@@ -210,6 +251,13 @@ function pushPath(&$object, $path, $newValue, bool $concat = false) {
         $obj[$key][] = $newValue;
 }
 
+/**
+ * Get item from path of array
+ *
+ * @param $object
+ * @param $path
+ * @return mixed|null
+ */
 function getPath(&$object, $path) {
     list(&$obj, $key) = getLastOfPath($object, $path);
 
@@ -219,6 +267,14 @@ function getPath(&$object, $path) {
     return $obj[$key] ?? null;
 }
 
+/**
+ * Merge arrays
+ *
+ * @param array $target
+ * @param array $source
+ * @param bool $overwrite
+ * @return array
+ */
 function deepMerge(array $target, array $source, bool $overwrite = false) {
     foreach ($source as $key => $value) {
         if (array_key_exists($key, $target)) {
@@ -238,14 +294,29 @@ function deepMerge(array $target, array $source, bool $overwrite = false) {
     return $target;
 }
 
+/**
+ * Capitalize words
+ *
+ * @param string $str
+ * @return string
+ */
 function capitalize(string $str): string {
     return mb_strtoupper(mb_substr($str, 0, 1)).mb_substr($str, 1);
 }
 
+/**
+ * Escape regex values
+ *
+ * @param string $str
+ * @return string
+ */
 function regexEscape(string $str): string {
-    return preg_replace("/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/", "\\$&", $str);
+    return preg_quote($str);
 }
 
+/**
+ * List of values to escape
+ */
 const ENTITY_MAP = [
     '&'         =>  '&amp;',
     '<'         =>  '&lt;',
@@ -255,6 +326,12 @@ const ENTITY_MAP = [
     '/'         =>  '&#x2F;'
 ];
 
+/**
+ * Escape some values
+ *
+ * @param $str
+ * @return mixed
+ */
 function escape($str) {
     if (is_string($str)) {
         return str_replace(array_keys(ENTITY_MAP), ENTITY_MAP, $str);

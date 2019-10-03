@@ -8,22 +8,40 @@
 
 namespace Pkly\I18Next;
 
+/**
+ * Class JsonLoader
+ *
+ * Basic loader used for loading data from .json files
+ *
+ * @package Pkly\I18Next
+ */
 class JsonLoader extends Loader {
     /**
      * @var string|null
      */
     private $_filePath                          =   null;
 
+    /**
+     * Get defaults used for this class
+     *
+     * @return array
+     */
     public static function getDefaults(): array {
         return [
-            'parse'             =>  '\json_decode'
+            'parse'             =>  function ($d) { return \json_decode($d, true); }
         ];
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getModuleName(): string {
         return 'loader-basic-json';
     }
 
+    /**
+     * @inheritDoc
+     */
     public function init(&$services, array $options, I18n &$instance): void {
         parent::init($services, $options, $instance);
         $this->_options = Utils\arrayMergeRecursiveDistinct(self::getDefaults(), $this->_options);
@@ -36,19 +54,27 @@ class JsonLoader extends Loader {
         $this->_filePath = $options['json_resource_path'];
     }
 
+    /**
+     * @inheritDoc
+     */
     public function read($language, $namespace) {
         /**
          * @var Interpolator $interpolator
          */
         $interpolator = &$this->_services->_interpolator;
         $path = $interpolator->interpolate($this->_filePath, ['lng' => $language, 'ns' => $namespace]);
-        // TODO: Check why interpolation here is failing
 
         return $this->load($path);
     }
 
+    /**
+     * Load data from file
+     *
+     * @param $path
+     * @return mixed|null
+     */
     private function load($path) {
-        $paths = [$path, $this->_options['json_root_path'] . $path];
+        $paths = [$path];
         $path = null;
 
         foreach ($paths as $p) {

@@ -10,16 +10,45 @@ namespace Pkly\I18Next;
 
 require_once __DIR__ . '/Utils.php';
 
+/**
+ * Class LanguageUtil
+ *
+ * Utility class for providing the user with various data about the requested keys or languages
+ *
+ * @package Pkly\I18Next
+ */
 class LanguageUtil {
+    /**
+     * @var array
+     */
     private $_options                           =   [];
+
+    /**
+     * Whitelist for codes
+     *
+     * When false or empty the whitelist is disabled and everything is returned as whitelisted
+     *
+     * @var bool|array
+     */
     private $_whitelist                         =   false;
 
+    /**
+     * LanguageUtil constructor.
+     *
+     * @param array $options
+     */
     public function __construct(array $options = []) {
         $this->_options = $options;
 
         $this->_whitelist = $this->_options['whitelist'] ?? false;
     }
 
+    /**
+     * Return the script part from code
+     *
+     * @param string $code
+     * @return string|null
+     */
     public function getScriptPartFromCode(string $code) {
         if (!$code || mb_strpos($code, '-') === false)
             return null;
@@ -31,6 +60,12 @@ class LanguageUtil {
         return $this->formatLanguageCode(implode('-', $p));
     }
 
+    /**
+     * Return the language part from code
+     *
+     * @param string $code
+     * @return string
+     */
     public function getLanguagePartFromCode(string $code) {
         if (!$code || mb_strpos($code, '-') === false)
             return $code;
@@ -39,6 +74,12 @@ class LanguageUtil {
         return $this->formatLanguageCode($p[0]);
     }
 
+    /**
+     * Format language code
+     *
+     * @param string $code
+     * @return string
+     */
     public function formatLanguageCode(string $code) {
         if (mb_strpos($code, '-') !== false) {
             $specialCases = ['hans', 'hant', 'latn', 'cyrl', 'cans', 'mong', 'arab'];
@@ -79,6 +120,12 @@ class LanguageUtil {
         return ($this->_options['cleanCode'] ?? false) || ($this->_options['lowerCaseLng'] ?? false) ? mb_strtolower($code) : $code;
     }
 
+    /**
+     * Check if a specified language code is whitelisted
+     *
+     * @param string $code
+     * @return bool
+     */
     public function isWhitelisted(string $code) {
         if ($this->_options['load'] ?? null === 'languageOnly' || $this->_options['nonExplicitWhitelist'] ?? false) {
             $code = $this->getLanguagePartFromCode($code);
@@ -87,6 +134,13 @@ class LanguageUtil {
         return $this->_whitelist === false || !count($this->_whitelist) || in_array($code, $this->_whitelist);
     }
 
+    /**
+     * Get fallback language codes
+     *
+     * @param $fallbacks
+     * @param string|null $code
+     * @return array|mixed|string|null
+     */
     public function getFallbackCodes($fallbacks, ?string $code = null) {
         if (!$fallbacks)
             return [];
@@ -114,6 +168,13 @@ class LanguageUtil {
         return $found ?? [];
     }
 
+    /**
+     * Resolve hierarchy between language codes
+     *
+     * @param string|null $code
+     * @param string|null $fallbackCode
+     * @return array
+     */
     public function toResolveHierarchy(?string $code, ?string $fallbackCode = null) {
         $fallbackCodes = $this->getFallbackCodes($fallbackCode ?? $this->_options['fallbackLng'] ?? [], $code);
 

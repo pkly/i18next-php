@@ -52,6 +52,8 @@ const STORE_API = [
  */
 class I18n implements LoggerAwareInterface {
     /**
+     * Instance options
+     *
      * @var array
      */
     private $_options                           =   [];
@@ -117,6 +119,8 @@ class I18n implements LoggerAwareInterface {
     private static $_instance                   =   null;
 
     /**
+     * Return shared instance of the translation framework
+     *
      * @return I18n
      */
     public static function &get(...$args): I18n {
@@ -126,6 +130,11 @@ class I18n implements LoggerAwareInterface {
         return self::$_instance;
     }
 
+    /**
+     * I18n constructor.
+     *
+     * @param array $options
+     */
     public function __construct(array $options = []) {
         $this->_options = Utils\transformOptions($options);
 
@@ -135,11 +144,22 @@ class I18n implements LoggerAwareInterface {
         $this->init($this->_options);
     }
 
+    /**
+     * Specify a Psr/Log compatible logger to be used
+     *
+     * @param LoggerInterface $logger
+     * @return $this|void
+     */
     public function setLogger(LoggerInterface $logger) {
         $this->_logger = $logger;
         return $this;
     }
 
+    /**
+     * Initialize or re-initialize the translation framework
+     *
+     * @param array|null $options
+     */
     public function init(?array $options = null) {
         if ($options === null)
             $options = $this->_options;
@@ -183,6 +203,9 @@ class I18n implements LoggerAwareInterface {
         $this->changeLanguage($this->_options['lng']);
     }
 
+    /**
+     * Load resources for the framework
+     */
     public function loadResources() {
         if (!isset($this->_options['resources']) || $this->_options['partialBundledLanguages']) {
             if ($this->_language && mb_strtolower($this->_language) === 'cimode')
@@ -215,6 +238,12 @@ class I18n implements LoggerAwareInterface {
         }
     }
 
+    /**
+     * Reload resources
+     *
+     * @param null $lngs
+     * @param null $ns
+     */
     public function reloadResources($lngs = null, $ns = null) {
         if (!$lngs)
             $lngs = $this->_languages;
@@ -261,6 +290,11 @@ class I18n implements LoggerAwareInterface {
         return $this;
     }
 
+    /**
+     * Change currently used language
+     *
+     * @param string $lng
+     */
     public function changeLanguage(string $lng) {
         $setLng = function ($l) {
             if ($l) {
@@ -287,8 +321,10 @@ class I18n implements LoggerAwareInterface {
     }
 
     /**
-     * @param string[]|string $lng
-     * @param string[]|string $ns
+     * Get a translation function locked to specific data
+     *
+     * @param $lng
+     * @param $ns
      * @return \Closure
      */
     public function getFixedT($lng, $ns) {
@@ -321,14 +357,31 @@ class I18n implements LoggerAwareInterface {
         };
     }
 
+    /**
+     * Translate text
+     *
+     * @param mixed ...$args
+     * @return array|mixed|string|null
+     */
     public function t(...$args) {
         return $this->_translator->translate(...$args) ?? null;
     }
 
+    /**
+     * Check if a key has a translation
+     *
+     * @param mixed ...$args
+     * @return bool|null
+     */
     public function exists(...$args) {
         return $this->_translator->exists(...$args) ?? null;
     }
 
+    /**
+     * Change default namespace
+     *
+     * @param string $ns
+     */
     public function setDefaultNamespace(string $ns) {
         $this->_options['defaultNS'] = [$ns];
     }
@@ -337,6 +390,12 @@ class I18n implements LoggerAwareInterface {
 
     // TODO: loadLanguages
 
+    /**
+     * Get text direction
+     *
+     * @param string|null $lng
+     * @return string
+     */
     public function dir(?string $lng): string {
         if (!$lng)
             $lng = $this->_languages[0] ?? $this->_language;
@@ -347,7 +406,11 @@ class I18n implements LoggerAwareInterface {
         return in_array($this->_services->_languageUtils->getLanguagePartFromCode($lng), RTL_LANGUAGES) ? 'rtl' : 'ltr';
     }
 
-
+    /**
+     * Overloaded clone operation
+     *
+     * @return I18n
+     */
     public function __clone() {
         $clone = clone $this;
         $clone->_options = array_merge($clone->_options, ['isClone' => true]);

@@ -8,6 +8,20 @@
 
 namespace Pkly\I18Next;
 
+/**
+ * Interface PostProcessorInterface
+ *
+ * @package Pkly\I18Next
+ */
 interface PostProcessorInterface {
-    public function process();
+    /**
+     * Process the value
+     *
+     * @param $value
+     * @param $key
+     * @param $options
+     * @param $translator
+     * @return mixed
+     */
+    public function process($value, $key, $options, $translator);
 }

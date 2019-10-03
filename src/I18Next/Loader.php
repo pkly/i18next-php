@@ -12,7 +12,14 @@ use Psr\Log\LoggerInterface;
 
 require_once __DIR__ . '/Utils.php';
 
-class Loader implements ModuleInterface {
+/**
+ * Class Loader
+ *
+ * Base class for loaders to be used in I18n
+ *
+ * @package Pkly\I18Next
+ */
+abstract class Loader implements ModuleInterface {
     /**
      * @var array
      */
@@ -57,7 +64,23 @@ class Loader implements ModuleInterface {
         $this->_services = &$services;
     }
 
+    /**
+     * TODO: Fill out
+     *
+     * @param $languages
+     * @param $namespace
+     * @param $key
+     * @param $fallbackValue
+     * @param array $options
+     * @param bool $isUpdate
+     */
     public function create($languages, $namespace, $key, $fallbackValue, array $options = [], $isUpdate = false) {}
 
+    /**
+     * Read data for requested language and namespace
+     *
+     * @param $language
+     * @param $namespace
+     */
     public function read($language, $namespace) {}
 }

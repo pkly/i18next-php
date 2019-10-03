@@ -12,6 +12,15 @@ use Psr\Log\LoggerInterface;
 
 require_once __DIR__ . '/Utils.php';
 
+/**
+ * Class TranslationLoadManager
+ *
+ * This class is the equivalent of BackendConnector in i18next for JS, as we're already on the backend that name
+ * didn't really make much sense, as such it was renamed. Functionality is kept mostly in-tact with the BackendController,
+ * with small changes made
+ *
+ * @package Pkly\I18Next
+ */
 class TranslationLoadManager {
     /**
      * @var array
@@ -48,6 +57,14 @@ class TranslationLoadManager {
      */
     private $_state                             =   [];
 
+    /**
+     * TranslationLoadManager constructor.
+     *
+     * @param Loader|null $loader
+     * @param ResourceStore $store
+     * @param $services
+     * @param array $options
+     */
     public function __construct(?Loader &$loader, ResourceStore &$store, &$services, array $options = []) {
         $this->_loader = &$loader;
         $this->_store = &$store;
@@ -56,11 +73,25 @@ class TranslationLoadManager {
         $this->_logger = &$services->_logger;
     }
 
+    /**
+     * Set loader for manager
+     *
+     * @param Loader|null $loader
+     * @return $this
+     */
     public function setLoader(?Loader &$loader) {
         $this->_loader = &$loader;
         return $this;
     }
 
+    /**
+     * Queue load to run
+     *
+     * @param array $languages
+     * @param array $namespaces
+     * @param array $options
+     * @return array
+     */
     public function queueLoad(array $languages, array $namespaces, array $options = []) {
         $toLoad = [];
         $pending = [];
@@ -118,6 +149,12 @@ class TranslationLoadManager {
         ];
     }
 
+    /**
+     * Process loaded data for request
+     *
+     * @param $name
+     * @param $data
+     */
     public function loaded($name, $data) {
         list($lng, $ns) = explode("|", $name);
 
@@ -131,7 +168,7 @@ class TranslationLoadManager {
 
         $remove = function(&$arr, $what) {
             while (($pos = array_search($what, $arr)) !== false) {
-                unset($what[$pos]);
+                unset($arr[$pos]);
             }
         };
 
@@ -161,6 +198,14 @@ class TranslationLoadManager {
         });
     }
 
+    /**
+     * Read data from loader
+     *
+     * @param $lng
+     * @param $ns
+     * @param $fcName
+     * @return |null
+     */
     public function read($lng, $ns, $fcName) {
         if (!$lng)
             return null;
@@ -173,6 +218,14 @@ class TranslationLoadManager {
         return $this->_loader->{$fcName}($lng, $ns);
     }
 
+    /**
+     * Prepare loading for resources
+     *
+     * @param $languages
+     * @param $namespaces
+     * @param array $options
+     * @return bool|null
+     */
     public function prepareLoading($languages, $namespaces, array $options = []) {
         if ($this->_loader === null) {
             $this->_logger->warning('No loader was added via i18next.useModule. Will not load resources.');
@@ -200,14 +253,32 @@ class TranslationLoadManager {
         return true;
     }
 
+    /**
+     * Load resources
+     *
+     * @param $languages
+     * @param $namespaces
+     */
     public function load($languages, $namespaces) {
         $this->prepareLoading($languages, $namespaces);
     }
 
+    /**
+     * Reload resources
+     *
+     * @param $languages
+     * @param $namespaces
+     */
     public function reload($languages, $namespaces) {
         $this->prepareLoading($languages, $namespaces, ['reload' => true]);
     }
 
+    /**
+     * Load data for language and namespace by string
+     *
+     * @param $name
+     * @param string $prefix
+     */
     public function loadOne($name, string $prefix = '') {
         list($lng, $ns) = explode("|", $name);
 
@@ -224,6 +295,16 @@ class TranslationLoadManager {
         }
     }
 
+    /**
+     * Save missing keys and data
+     *
+     * @param $languages
+     * @param $namespace
+     * @param $key
+     * @param $fallbackValue
+     * @param bool $isUpdate
+     * @param array $options
+     */
     public function saveMissing($languages, $namespace, $key, $fallbackValue, bool $isUpdate = false, array $options = []) {
         // TODO: implement
     }

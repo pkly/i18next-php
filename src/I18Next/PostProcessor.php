@@ -8,13 +8,39 @@
 
 namespace Pkly\I18Next;
 
+/**
+ * Class PostProcessor
+ *
+ * Contains post processors to be used on values
+ *
+ * @package Pkly\I18Next
+ */
 class PostProcessor {
+    /**
+     * @var PostProcessorInterface[]
+     */
     private $_processors                        =   [];
 
+    /**
+     * Add a new post processor
+     *
+     * @param string $name
+     * @param $object
+     */
     public function addPostProcessor(string $name, &$object) {
         $this->_processors[$name] = &$object;
     }
 
+    /**
+     * Handle post processing for specified value
+     *
+     * @param $processors
+     * @param $value
+     * @param $key
+     * @param array $options
+     * @param $translator
+     * @return mixed
+     */
     public function handle($processors, $value, $key, array $options, $translator) {
         foreach ($processors as $name) {
             if (array_key_exists($name, $this->_processors))

@@ -10,10 +10,32 @@ namespace Pkly\I18Next;
 
 require_once __DIR__ . '/Utils.php';
 
+/**
+ * Class ResourceStore
+ *
+ * Container for language keys ready to be used for translation
+ *
+ * @package Pkly\I18Next
+ */
 class ResourceStore implements \JsonSerializable {
+    /**
+     * Stored currently loaded data
+     *
+     * @var array
+     */
     private $_data                              =   [];
+
+    /**
+     * @var array|null
+     */
     private $_options                           =   [];
 
+    /**
+     * ResourceStore constructor.
+     *
+     * @param array $data
+     * @param array|null $options
+     */
     public function __construct(array $data = [], ?array $options = null) {
         $this->_data = $data;
 
@@ -31,6 +53,11 @@ class ResourceStore implements \JsonSerializable {
         $this->_options = $options;
     }
 
+    /**
+     * Add namespace to options
+     *
+     * @param $namespaces
+     */
     public function addNamespaces($namespaces) {
         if (!is_array($namespaces))
             $namespaces = [$namespaces];
@@ -40,6 +67,11 @@ class ResourceStore implements \JsonSerializable {
                 $this->_options['ns'][] = $namespace;
     }
 
+    /**
+     * Remove namespace from options
+     *
+     * @param $namespaces
+     */
     public function removeNamespaces($namespaces) {
         if (!is_array($namespaces))
             $namespaces = [$namespaces];
@@ -54,6 +86,15 @@ class ResourceStore implements \JsonSerializable {
         $this->_options['ns'] = array_values($this->_options['ns']);
     }
 
+    /**
+     * Get loaded resource
+     *
+     * @param string $lng
+     * @param string $ns
+     * @param null $key
+     * @param array $options
+     * @return mixed|null
+     */
     public function getResource(string $lng, string $ns, $key = null, array $options = []) {
         $keySeparator = $options['keySeparator'] ?? $this->_options['keySeparator'];
 
@@ -72,6 +113,15 @@ class ResourceStore implements \JsonSerializable {
         return Utils\getPath($this->_data, $path);
     }
 
+    /**
+     * Add new resource
+     *
+     * @param string $lng
+     * @param $ns
+     * @param $key
+     * @param $value
+     * @param array $options
+     */
     public function addResource(string $lng, $ns, $key, $value, array $options = ['silent' => false]) {
         $keySeparator = $options['keySeparator'] ?? $this->_options['keySeparator'];
 
@@ -93,6 +143,14 @@ class ResourceStore implements \JsonSerializable {
         // event emitting here
     }
 
+    /**
+     * Add multiple new resources
+     *
+     * @param string $lng
+     * @param $ns
+     * @param array $resources
+     * @param array $options
+     */
     public function addResources(string $lng, $ns, array $resources, array $options = ['silent' => false]) {
         foreach ($resources as $key => $value) {
             if (is_string($value))
@@ -102,6 +160,16 @@ class ResourceStore implements \JsonSerializable {
         // event emitting here
     }
 
+    /**
+     * Add resource bundle
+     *
+     * @param string $lng
+     * @param $ns
+     * @param $resources
+     * @param bool $deep
+     * @param bool $overwrite
+     * @param array $options
+     */
     public function addResourceBundle(string $lng, $ns, $resources, bool $deep = false, bool $overwrite = false, array $options = ['silent' => false]) {
         $path = [$lng, $ns];
 
@@ -128,6 +196,12 @@ class ResourceStore implements \JsonSerializable {
         // event emitting here
     }
 
+    /**
+     * Remove resource bundle
+     *
+     * @param string $lng
+     * @param string $ns
+     */
     public function removeResourceBundle(string $lng, string $ns) {
         if ($this->hasResourceBundle($lng, $ns)) {
             unset($this->_data[$lng][$ns]);
@@ -138,10 +212,24 @@ class ResourceStore implements \JsonSerializable {
         // event emitting here
     }
 
+    /**
+     * Check if a resource bundle exists
+     *
+     * @param string $lng
+     * @param string $ns
+     * @return bool
+     */
     public function hasResourceBundle(string $lng, string $ns): bool {
         return $this->getResource($lng, $ns) !== null;
     }
 
+    /**
+     * Get resource bundle
+     *
+     * @param string $lng
+     * @param string|null $ns
+     * @return mixed|null
+     */
     public function getResourceBundle(string $lng, ?string $ns = null) {
         if ($ns === null)
             $ns = $this->_options['defaultNS'];
@@ -149,10 +237,19 @@ class ResourceStore implements \JsonSerializable {
         return $this->getResource($lng, $ns);
     }
 
+    /**
+     * Get data by language
+     *
+     * @param string $lng
+     * @return mixed|null
+     */
     public function getDataByLanguage(string $lng) {
         return $this->_data[$lng] ?? null;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function jsonSerialize() {
         return $this->_data ?? [];
     }

@@ -6,18 +6,15 @@ This project focuses only on the 3rd version of i18next, disregarding compatibil
 
 ### Warning!
 
-This version is still in early development stages, I'm advising against using it. As of now.
-This project is something I'm working on between other work, as such the updates may appear spontanously.
-
-It's extremely likely that things are broken as right now I'm simply porting over the 
-JS code without testing it for compatibility with PHP.
+This version is usable, but could contain bugs. 
+If you find any issues please report them or create a PR.
 
 ### Features
 
 * PSR3 logging support (psr/log is a hard requirement, but you're not required to actually use a logger)
 * Extremely similar API to the JS version
 * PHP-specific features like interfaces for modules
-* 7.1+ syntax / support
+* PHP 7.3+ 
 
 ### Composer
 
@@ -27,11 +24,9 @@ Simply enter your project directory and run
 
 ### Todo
 
-* Finish all components
+* Add missing functions
 * Port over tests
 * Actually test it
-* Add PHP-specific loading code for files, searching etc.
-* Add PHPDocs with examples and links to i18next
 
 #### Packagist
 

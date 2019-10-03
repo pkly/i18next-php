@@ -12,6 +12,13 @@ use Psr\Log\LoggerInterface;
 
 require_once __DIR__ . '/Utils.php';
 
+/**
+ * Class Translator
+ *
+ * Takes the input and turns it into something actually usable
+ *
+ * @package Pkly\I18Next
+ */
 class Translator {
     /**
      * @var array
@@ -44,6 +51,11 @@ class Translator {
     public $_interpolator                       =   null;
 
     /**
+     * @var TranslationLoadManager|null
+     */
+    public $_translationLoadManager             =   null;
+
+    /**
      * @var null
      */
     public $_i18nFormat                         =   null;
@@ -58,13 +70,19 @@ class Translator {
      */
     public $_logger                             =   null;
 
+    /**
+     * Translator constructor.
+     *
+     * @param $services
+     * @param array $options
+     */
     public function __construct(&$services, array $options = []) {
         Utils\copy([
             '_resourceStore',
             '_languageUtils',
             '_pluralResolver',
             '_interpolator',
-            '_backendConnector',
+            '_translationLoadManager',
             '_i18nFormat',
             '_postProcessor',
             '_logger'
@@ -76,20 +94,44 @@ class Translator {
         }
     }
 
+    /**
+     * Change current language
+     *
+     * @param string $lng
+     */
     public function changeLanguage(string $lng) {
         if ($lng)
             $this->_language = $lng;
     }
 
+    /**
+     * Get current language
+     *
+     * @return string
+     */
     public function getLanguage(): string {
         return $this->_language;
     }
 
+    /**
+     * Check if key exists
+     *
+     * @param string $key
+     * @param array $options
+     * @return bool
+     */
     public function exists(string $key, array $options = ['interpolation' => []]): bool {
         $resolved = $this->resolve($key, $options);
         return $resolved && !($resolved['res'] instanceof \stdClass);
     }
 
+    /**
+     * Extract key and namespaces from key
+     *
+     * @param string $key
+     * @param array $options
+     * @return array
+     */
     public function extractFromKey(string $key, array $options = []) {
         $nsSeparator = $options['nsSeparator'] ?? $this->_options['nsSeparator'] ?? ':';
         $keySeparator = $options['keySeparator'] ?? $this->_options['keySeparator'];
@@ -113,6 +155,13 @@ class Translator {
         ];
     }
 
+    /**
+     * Translate text
+     *
+     * @param $keys
+     * @param array|null $options
+     * @return array|mixed|string
+     */
     public function translate($keys, ?array $options = null) {
         if (!is_array($options) && isset($this->_options['overloadTranslationOptionHandler'])) {
             $options = call_user_func($this->_options['overloadTranslationOptionHandler'], func_get_args());
@@ -214,7 +263,42 @@ class Translator {
                 $res = $key;
             }
 
-            // TODO: save missing ( https://github.com/i18next/i18next/blob/master/src/Translator.js#L176 )
+            // save missing
+            $updateMissing = $options['defaultValue'] ?? false && $options['defaultValue'] !== $res && $this->_options['updateMissing'];
+            if ($usedKey || $usedDefault || $updateMissing) {
+                $this->_logger->info(($updateMissing ? 'UpdateKey' : 'MissingKey'), ['lng' => $lng, 'ns' => $namespace, 'key' => $key, 'updateMissing' => $updateMissing ? $options['defaultValue'] : $res]);
+
+                $lngs = [];
+                $fallbackLngs = $this->_languageUtils->getFallbackCodes($this->_options['fallbackLng'], $options['lng'] ?? $this->_language);
+                if ($this->_options['saveMissingTo'] === 'fallback' && count($fallbackLngs))
+                    $lngs = $fallbackLngs;
+                else if ($this->_options['saveMissingTo'] === 'all')
+                    $lngs = $this->_languageUtils->toResolveHierarchy($options['lng'] ?? $this->_language);
+                else
+                    $lngs[] = $options['lng'] ?? $this->_language;
+
+                $send = function($l, $k) use ($namespace, $updateMissing, $options, $res) {
+                    if (isset($this->_options['missingKeyHandler']) && is_callable([$this->_options, 'missingKeyHandler'])) {
+                        call_user_func([$this->_options, 'missingKeyHandler'], $l, $namespace, $k, $updateMissing ? $options['defaultValue'] ?? null : $res, $updateMissing, $options);
+                    }
+                    else if ($this->_translationLoadManager !== null) {
+                        $this->_translationLoadManager->saveMissing($l, $namespace, $k, $updateMissing ? $options['defaultValue'] ?? null : $res, $updateMissing, $options);
+                    }
+                    // TODO: Event emitting here missingKey
+                };
+
+                if ($this->_options['saveMissing'] ?? false) {
+                    $needsPluralHandling = isset($options['count']) && is_numeric($options['count']);
+                    if ($this->_options['saveMissingPlurals'] ?? true && $needsPluralHandling) {
+                        foreach ($lngs as $l) {
+                            foreach ($this->_pluralResolver->getPluralFormsOfKey($l, $key) as $p)
+                                $send([$l], $p);
+                        }
+                    }
+                    else
+                        $send($lngs, $key);
+                }
+            }
 
             // extend
             $res = $this->extendTranslation($res, $keys, $options, $resolved);
@@ -232,9 +316,18 @@ class Translator {
         return $res;
     }
 
+    /**
+     * Extend translations
+     *
+     * @param $res
+     * @param $key
+     * @param $options
+     * @param array $resolved
+     * @return mixed|string
+     */
     public function extendTranslation($res, $key, $options, array $resolved = []) {
         if (is_callable([$this->_i18nFormat, 'parse'])) {
-            $res = $this->_i18nFormat->parse($res, $options, $resolved['usedLng'], $resolved['usedNS'], $resolved['usedKey'], $resolved);
+            $res = call_user_func([$this->_i18nFormat, 'parse'], $res, $options, $resolved['usedLng'], $resolved['usedNS'], $resolved['usedKey'], $resolved);
         }
         else if (!($options['skipInterpolation'] ?? false)) {
             // i18next.parsing
@@ -268,6 +361,13 @@ class Translator {
         return $res;
     }
 
+    /**
+     * Resolve key lookup
+     *
+     * @param $keys
+     * @param array $options
+     * @return array
+     */
     public function resolve($keys, array $options = []) {
         if (!is_array($keys))
             $keys = [$keys];
@@ -353,6 +453,12 @@ class Translator {
         ];
     }
 
+    /**
+     * Check if resource is valid
+     *
+     * @param $res
+     * @return bool
+     */
     public function isValidLookup($res) {
         // In JS this includes an undefined check, but in PHP there's no such thing, so we're creating an stdClass instead, great I know.
         return !($res instanceof \stdClass) &&
@@ -360,6 +466,15 @@ class Translator {
             !(!($this->_options['returnEmptyString'] ?? true) && $res === '');
     }
 
+    /**
+     * Get resource
+     *
+     * @param $code
+     * @param $ns
+     * @param $key
+     * @param array $options
+     * @return mixed
+     */
     public function getResource($code, $ns, $key, array $options = []) {
         $f = is_callable([$this->_i18nFormat, 'getResource']) ?
             \Closure::fromCallable([$this->_i18nFormat, 'getResource']) :

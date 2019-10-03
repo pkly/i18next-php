@@ -11,6 +11,9 @@ namespace Pkly\I18Next;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
+/**
+ * @author i18next.com
+ */
 const SETS = [
     [
         'lngs'  =>  ['ach','ak','am','arn','br','fil','gun','ln','mfe','mg','mi','oc', 'pt', 'pt-BR',
@@ -135,6 +138,14 @@ const SETS = [
     ]
 ];
 
+/**
+ * Get rules for plural types
+ *
+ * This is a workaround for getting a const array with functions as values, as that's not allowed in PHP,
+ * data provided by i18next.com
+ *
+ * @return array
+ */
 function getRulesForPluralTypes(): array {
     return [
         1   =>  function($n) {
@@ -206,6 +217,11 @@ function getRulesForPluralTypes(): array {
     ];
 }
 
+/**
+ * Create plural rules
+ *
+ * @return array
+ */
 function createRules() {
     $rules = [];
     $rPluralTypes = getRulesForPluralTypes();
@@ -221,6 +237,13 @@ function createRules() {
     return $rules;
 }
 
+/**
+ * Class PluralResolver
+ *
+ * Resolves plurals required based on rules specified above
+ *
+ * @package Pkly\I18Next
+ */
 class PluralResolver {
     /**
      * @var array
@@ -242,6 +265,13 @@ class PluralResolver {
      */
     private $_rules                             =   [];
 
+    /**
+     * PluralResolver constructor.
+     *
+     * @param LanguageUtil $languageUtils
+     * @param array $options
+     * @param LoggerInterface|null $logger
+     */
     public function __construct(LanguageUtil &$languageUtils, array $options = [], ?LoggerInterface $logger = null) {
         $this->_languageUtils = &$languageUtils;
         $this->_options = $options;
@@ -254,20 +284,45 @@ class PluralResolver {
         $this->_rules = createRules();
     }
 
+    /**
+     * Add a new rule for language code
+     *
+     * @param string $lng
+     * @param array $obj
+     */
     public function addRule(string $lng, array $obj) {
         $this->_rules[$lng] = $obj;
     }
 
+    /**
+     * Get rules for a language code
+     *
+     * @param string $code
+     * @return array|null
+     */
     public function getRule(string $code): ?array {
         return $this->_rules[$code] ?? $this->_rules[$this->_languageUtils->getLanguagePartFromCode($code)] ?? null;
     }
 
+    /**
+     * Check if a plural is needed for language code
+     *
+     * @param string $code
+     * @return bool
+     */
     public function needsPlural(string $code): bool {
         $rule = $this->getRule($code);
 
         return count($rule['numbers'] ?? []) > 1;
     }
 
+    /**
+     * Get wanted forms for plurals for a language code and key
+     *
+     * @param string $code
+     * @param string|null $key
+     * @return array
+     */
     public function getPluralFormsOfKey(string $code, ?string $key) {
         $rule = $this->getRule($code);
 
@@ -284,6 +339,13 @@ class PluralResolver {
         return $ret;
     }
 
+    /**
+     * Get suffix for language for count
+     *
+     * @param string $code
+     * @param $count
+     * @return string
+     */
     public function getSuffix(string $code, $count): string {
         $rule = $this->getRule($code);
 
