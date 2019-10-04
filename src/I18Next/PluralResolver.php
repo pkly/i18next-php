@@ -354,17 +354,17 @@ class PluralResolver {
             $suffix = $rule['numbers'][$idx];
 
             // special treatment for lngs only having singular and plural
-            if ($this->_options['simplifyPluralSuffix'] ?? true && count($rule['numbers']) === 2 && $rule['numbers'][0] === 1) {
+            if (($this->_options['simplifyPluralSuffix'] ?? true) && count($rule['numbers']) === 2 && $rule['numbers'][0] === 1) {
                 if ($suffix === 2)
                     $suffix = 'plural';
                 else if ($suffix === 1)
                     $suffix = '';
             }
 
-            if ($this->_options['simplifyPluralSuffix'] ?? true && count($rule['numbers']) === 2 && $rule['numbers'][0] === 1)
-                return $this->_options['prepend'] ?? '' . $suffix;
+            if (($this->_options['simplifyPluralSuffix'] ?? true) && count($rule['numbers']) === 2 && $rule['numbers'][0] === 1)
+                return ($this->_options['prepend'] ?? '') . $suffix;
 
-            return $this->_options['prepend'] ?? '' . $idx;
+            return ($this->_options['prepend'] ?? '') . $idx;
         }
 
         $this->_logger->warning('No plural rule found for '.$code);
