@@ -22,6 +22,7 @@ If you find any issues please report them or create a PR.
 
 * [Basic shared usage through the whole application](examples/example-shared.php)
 * [Basic instancing of translation and separation from shared](examples/example-instance.php)
+* [Basic plural handling](examples/example-plurals.php)
 
 
 ### Composer
@@ -32,9 +33,7 @@ Simply enter your project directory and run
 
 ### Todo
 
-* Add missing functions
-* Port over tests
-* Actually test it
+* Add missing functions?
 
 #### Packagist
 
