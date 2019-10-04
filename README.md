@@ -16,6 +16,14 @@ If you find any issues please report them or create a PR.
 * PHP-specific features like interfaces for modules
 * PHP 7.3+ 
 
+### Usage
+
+[View all examples here](examples)
+
+* [Basic shared usage through the whole application](examples/example-shared.php)
+* [Basic instancing of translation and separation from shared](examples/example-instance.php)
+
+
 ### Composer
 
 Simply enter your project directory and run

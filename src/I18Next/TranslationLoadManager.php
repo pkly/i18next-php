@@ -176,7 +176,7 @@ class TranslationLoadManager {
             Utils\pushPath($q['loaded'], [$lng], $ns);
             $remove($q['pending'], $name);
 
-            if (count($q['pending']) === 0 && !$q['done'] ?? false) {
+            if (count($q['pending']) === 0 && !($q['done'] ?? false)) {
                 foreach ($q as $l => $v) {
                     if (!array_key_exists($l, $loaded))
                         $loaded[$l] = [];
