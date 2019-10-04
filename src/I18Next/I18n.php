@@ -8,7 +8,6 @@
 
 namespace Pkly\I18Next;
 
-use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -50,7 +49,7 @@ const STORE_API = [
  * @method mixed getResourceBundle(string $lng, ?string $ns = null)
  * @method mixed getDataByLanguage(string $lng)
  */
-class I18n implements LoggerAwareInterface {
+class I18n {
     /**
      * Instance options
      *
@@ -135,24 +134,17 @@ class I18n implements LoggerAwareInterface {
      *
      * @param array $options
      */
-    public function __construct(array $options = []) {
+    public function __construct(array $options = [], ?LoggerInterface $logger = null) {
         $this->_options = Utils\transformOptions($options);
 
         $this->_services = new \stdClass();
-        $this->_logger = new NullLogger();
+
+        if ($logger === null)
+            $logger = new NullLogger();
+
+        $this->_logger = $logger;
 
         $this->init($this->_options);
-    }
-
-    /**
-     * Specify a Psr/Log compatible logger to be used
-     *
-     * @param LoggerInterface $logger
-     * @return $this|void
-     */
-    public function setLogger(LoggerInterface $logger) {
-        $this->_logger = $logger;
-        return $this;
     }
 
     /**
@@ -177,7 +169,7 @@ class I18n implements LoggerAwareInterface {
             $this->_services->_pluralResolver = new PluralResolver($this->_services->_languageUtils, [
                 'prepend'               =>  $this->_options['pluralSeparator'],
                 'simplifyPluralSuffix'  =>  $this->_options['simplifyPluralSuffix']
-            ]);
+            ], $this->_logger);
             $this->_services->_interpolator = new Interpolator($this->_options, $this->_logger);
 
             $this->_translationLoadManager = new TranslationLoadManager($this->_loader, $this->_store, $this->_services, $this->_options);
