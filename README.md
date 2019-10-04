@@ -25,6 +25,30 @@ If you find any issues please report them or create a PR.
 * [Basic instancing of translation and separation from shared](examples/example-instance.php)
 * [Basic plural handling](examples/example-plurals.php)
 
+### Basic example
+
+```php
+// You can also use I18n globally via I18n::get()
+
+$i18n = new I18n([
+    'lng'           =>  'en',
+    'resources'     =>  [
+        'en'        =>  [
+            'translation'       =>  [
+                'key'           =>  'Value',
+                'key_plural'    =>  'Value plural'
+                'deeper'        =>  [
+                    'key'           =>  'Deep value'
+                ]
+            ]
+        ]
+    ]
+]);
+
+$i18n->t('key'); // "Value"
+$i18n->t('key', ['count' => 5]); // "Value plural"
+$i18n->t('deeper.key'); // "Depp value"
+```
 
 ### Composer
 
