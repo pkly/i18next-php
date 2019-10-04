@@ -1,4 +1,5 @@
 # i18next-php
+
 A port of [i18next](https://www.i18next.com/) in PHP. With a rest API. (coming soon \[tm\])
 
 Code in this repository is largely based on the original code base in JavaScript, rewritten in PHP.
@@ -33,7 +34,7 @@ Simply enter your project directory and run
 
 ### Todo
 
-* Add missing functions?
+* Add event emitting
 
 #### Packagist
 

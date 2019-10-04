@@ -65,7 +65,7 @@ abstract class Loader implements ModuleInterface {
     }
 
     /**
-     * TODO: Fill out
+     * Create missing entries for values
      *
      * @param $languages
      * @param $namespace

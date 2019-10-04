@@ -339,3 +339,26 @@ function escape($str) {
 
     return $str;
 }
+
+/**
+ * Turn variables into a string somewhat safely
+ *
+ * @param $val
+ * @return string
+ */
+function makeString($val): string {
+    if (is_string($val) || is_numeric($val))
+        return (string)$val;
+    else if (is_object($val)) {
+        if (method_exists($val, '__toString'))
+            return (string)$val;
+
+        return '[Object ' . get_class($val) . ']';
+    }
+    else if (is_array($val))
+        return '[Array ('.count($val).')]';
+    else if (is_null($val))
+        return '[Null]';
+
+    return '[Unknown]';
+}

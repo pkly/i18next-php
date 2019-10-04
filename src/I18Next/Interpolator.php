@@ -225,9 +225,8 @@ class Interpolator {
                     $value = '';
                 }
             }
-            else if (is_string($value) && !$this->_useRawValueToEscape) {
-                // TODO: This is basically some js bullshit that goes like '' + {} (presumably to transform things to [object Object] or [object Array])
-                $value = (string)$value;
+            else if (!is_string($value) && !$this->_useRawValueToEscape) {
+                $value = Utils\makeString($value);
             }
 
             $str = str_replace($match[0], $regexSafe($value), $str);
@@ -258,9 +257,8 @@ class Interpolator {
                     $value = '';
                 }
             }
-            else if (is_string($value) && !$this->_useRawValueToEscape) {
-                // TODO: This is basically some js bullshit that goes like '' + {} (presumably to transform things to [object Object] or [object Array])
-                $value = (string)$value;
+            else if (!is_string($value) && !$this->_useRawValueToEscape) {
+                $value = Utils\makeString($value);
             }
 
             $value = $this->_escapeValue ? $regexSafe(call_user_func($this->_escape, $value)) : $regexSafe($value);
