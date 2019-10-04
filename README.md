@@ -3,7 +3,7 @@
 A port of [i18next](https://www.i18next.com/) in PHP. With a rest API. (coming soon \[tm\])
 
 Code in this repository is largely based on the original code base in JavaScript, rewritten in PHP.
-This project focuses only on the 3rd version of i18next, disregarding compatibility with previous ones.
+This project focuses only on the newest version of i18next, disregarding compatibility with previous ones.
 
 ### Warning!
 
