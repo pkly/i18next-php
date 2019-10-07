@@ -8,6 +8,7 @@
 
 namespace Pkly\I18Next;
 
+use Pkly\I18Next\Plugin\BaseLoader;
 use Psr\Log\LoggerInterface;
 
 require_once __DIR__ . '/Utils.php';
@@ -33,7 +34,7 @@ class TranslationLoadManager {
     private $_store                             =   null;
 
     /**
-     * @var Loader|null
+     * @var BaseLoader|null
      */
     private $_loader                            =   null;
 
@@ -60,12 +61,12 @@ class TranslationLoadManager {
     /**
      * TranslationLoadManager constructor.
      *
-     * @param Loader|null $loader
+     * @param BaseLoader|null $loader
      * @param ResourceStore $store
      * @param $services
      * @param array $options
      */
-    public function __construct(?Loader &$loader, ResourceStore &$store, &$services, array $options = []) {
+    public function __construct(?BaseLoader &$loader, ResourceStore &$store, &$services, array $options = []) {
         $this->_loader = &$loader;
         $this->_store = &$store;
         $this->_options = $options;
@@ -76,10 +77,10 @@ class TranslationLoadManager {
     /**
      * Set loader for manager
      *
-     * @param Loader|null $loader
+     * @param BaseLoader|null $loader
      * @return $this
      */
-    public function setLoader(?Loader &$loader) {
+    public function setLoader(?BaseLoader &$loader) {
         $this->_loader = &$loader;
         return $this;
     }

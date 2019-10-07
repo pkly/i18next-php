@@ -24,7 +24,7 @@ class LanguageUtil {
     /**
      * @var array
      */
-    private $_options                           =   [];
+    protected $_options                         =   [];
 
     /**
      * Whitelist for codes
@@ -33,12 +33,12 @@ class LanguageUtil {
      *
      * @var bool|array
      */
-    private $_whitelist                         =   false;
+    protected $_whitelist                       =   false;
 
     /**
      * @var LoggerInterface|null
      */
-    private $_logger                            =   null;
+    protected $_logger                          =   null;
 
     /**
      * LanguageUtil constructor.

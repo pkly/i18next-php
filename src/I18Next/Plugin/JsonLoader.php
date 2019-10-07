@@ -6,7 +6,11 @@
  * Time: 12:13
  */
 
-namespace Pkly\I18Next;
+namespace Pkly\I18Next\Plugin;
+
+use Pkly\I18Next\I18n;
+use Pkly\I18Next\Interpolator;
+use Pkly\I18Next\Utils;
 
 /**
  * Class JsonLoader
@@ -15,11 +19,16 @@ namespace Pkly\I18Next;
  *
  * @package Pkly\I18Next
  */
-class JsonLoader extends Loader {
+class JsonLoader extends BaseLoader {
     /**
      * @var string|null
      */
-    private $_filePath                          =   null;
+    protected $_filePath                        =   null;
+
+    /**
+     * @var array
+     */
+    protected $_jsonOptions                     =   [];
 
     /**
      * Get defaults used for this class
@@ -30,6 +39,10 @@ class JsonLoader extends Loader {
         return [
             'parse'             =>  function ($d) { return \json_decode($d, true); }
         ];
+    }
+
+    public function __construct(array $options = []) {
+        $this->_jsonOptions = $options;
     }
 
     /**
@@ -44,14 +57,14 @@ class JsonLoader extends Loader {
      */
     public function init(&$services, array $options, I18n &$instance): void {
         parent::init($services, $options, $instance);
-        $this->_options = Utils\arrayMergeRecursiveDistinct(self::getDefaults(), $this->_options);
+        $this->_options = Utils\arrayMergeRecursiveDistinct(self::getDefaults(), $this->_options, $this->_jsonOptions);
 
         if (!isset($this->_options['json_resource_path'])) {
             $this->_logger->error('No resource path was found for the JsonLoader instance', $options);
             return;
         }
 
-        $this->_filePath = $options['json_resource_path'];
+        $this->_filePath = $this->_options['json_resource_path'];
     }
 
     /**
@@ -73,7 +86,7 @@ class JsonLoader extends Loader {
      * @param $path
      * @return mixed|null
      */
-    private function load($path) {
+    protected function load($path) {
         $paths = [$path];
         $path = null;
 

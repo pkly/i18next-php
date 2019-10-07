@@ -4,16 +4,15 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use Pkly\I18Next\I18n;
-use Pkly\I18Next\JsonLoader;
+use Pkly\I18Next\Plugin\JsonLoader;
 
 I18n::get([
-    'lng'                   =>  'en',
-    'json_resource_path'    =>  __DIR__ . '/data/{{lng}}/{{ns}}.json'
+    'lng'                   =>  'en'
 ]);
 
-$jsonLoader = new JsonLoader();
-
-I18n::get()->useModule($jsonLoader);
+I18n::get()->useModule(new JsonLoader([
+    'json_resource_path'    =>  __DIR__ . '/data/{{lng}}/{{ns}}.json'
+]));
 
 echo "Reading 'key' from file - " . I18n::get()->t('key') . "\n";
 // Outputs "Translation from file"

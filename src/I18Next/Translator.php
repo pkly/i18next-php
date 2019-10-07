@@ -23,12 +23,12 @@ class Translator {
     /**
      * @var array
      */
-    private $_options                           =   [];
+    protected $_options                         =   [];
 
     /**
      * @var string
      */
-    private $_language                          =   '';
+    protected $_language                        =   '';
 
     /**
      * @var ResourceStore|null

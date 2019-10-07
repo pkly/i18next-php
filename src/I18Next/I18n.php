@@ -8,6 +8,7 @@
 
 namespace Pkly\I18Next;
 
+use Pkly\I18Next\Plugin\BaseLoader;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -55,67 +56,67 @@ class I18n {
      *
      * @var array
      */
-    private $_options                           =   [];
+    protected $_options                         =   [];
 
     /**
      * @var LoggerInterface|null
      */
-    private $_logger                            =   null;
+    protected $_logger                          =   null;
 
     /**
      * @var array
      */
-    private $_languages                         =   [];
+    protected $_languages                       =   [];
 
     /**
      * @var string
      */
-    private $_language                          =   '';
+    protected $_language                        =   '';
 
     /**
      * @var array
      */
-    private $_modules                           =   ['external' => []];
+    protected $_modules                         =   ['external' => []];
 
     /**
      * @var null|\Closure
      */
-    private $_format                            =   null;
+    protected $_format                          =   null;
 
     /**
      * @var null|\stdClass
      */
-    private $_services                          =   null;
+    protected $_services                        =   null;
 
     /**
      * @var ResourceStore|null
      */
-    private $_store                             =   null;
+    protected $_store                           =   null;
 
     /**
      * @var Translator|null
      */
-    private $_translator                        =   null;
+    protected $_translator                      =   null;
 
     /**
      * @var PostProcessor|null
      */
-    private $_postProcessor                     =   null;
+    protected $_postProcessor                   =   null;
 
     /**
      * @var TranslationLoadManager|null
      */
-    private $_translationLoadManager            =   null;
+    protected $_translationLoadManager          =   null;
 
     /**
-     * @var Loader|null
+     * @var BaseLoader|null
      */
-    private $_loader                            =   null;
+    protected $_loader                          =   null;
 
     /**
      * @var null|I18n
      */
-    private static $_instance                   =   null;
+    protected static $_instance                 =   null;
 
     /**
      * Return shared instance of the translation framework
@@ -124,7 +125,7 @@ class I18n {
      */
     public static function &get(...$args): I18n {
         if (self::$_instance === null)
-            self::$_instance = new I18n(...$args);
+            self::$_instance = new static(...$args);
 
         return self::$_instance;
     }
@@ -252,13 +253,13 @@ class I18n {
      * @param ModuleInterface $module
      * @return $this
      */
-    public function useModule(ModuleInterface &$module) {
+    public function useModule(ModuleInterface $module) {
         if ($module->getModuleType() === MODULE_TYPE_LANGUAGE_DETECTOR) {
-            $this->_modules['languageDetector'] = &$module;
+            $this->_modules['languageDetector'] = $module;
         }
 
         if ($module->getModuleType() === MODULE_TYPE_I18N_FORMAT) {
-            $this->_modules['i18nFormat'] = &$module;
+            $this->_modules['i18nFormat'] = $module;
         }
 
         if ($module->getModuleType() === MODULE_TYPE_POST_PROCESSOR && $module instanceof PostProcessorInterface) {
@@ -266,11 +267,11 @@ class I18n {
         }
 
         if ($module->getModuleType() === MODULE_TYPE_EXTERNAL) {
-            $this->_modules['external'][] = &$module;
+            $this->_modules['external'][] = $module;
         }
 
         if ($module->getModuleType() === MODULE_TYPE_LOADER) {
-            $this->_loader = &$module;
+            $this->_loader = $module;
             $this->_loader->init($this->_services, $this->_options, $this);
 
             if ($this->_translationLoadManager !== null)

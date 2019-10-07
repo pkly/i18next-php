@@ -6,11 +6,15 @@
  * Time: 12:13
  */
 
-namespace Pkly\I18Next;
+namespace Pkly\I18Next\Plugin;
 
+use Pkly\I18Next\I18n;
+use Pkly\I18Next\ModuleInterface;
 use Psr\Log\LoggerInterface;
+use const Pkly\I18Next\MODULE_TYPE_LOADER;
+use Pkly\I18Next\Utils;
 
-require_once __DIR__ . '/Utils.php';
+require_once __DIR__ . '/../Utils.php';
 
 /**
  * Class Loader
@@ -19,7 +23,7 @@ require_once __DIR__ . '/Utils.php';
  *
  * @package Pkly\I18Next
  */
-abstract class Loader implements ModuleInterface {
+abstract class BaseLoader implements ModuleInterface {
     /**
      * @var array
      */

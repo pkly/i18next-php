@@ -24,87 +24,87 @@ class Interpolator {
     /**
      * @var array
      */
-    private $_options                           =   [];
+    protected $_options                         =   [];
 
     /**
      * @var LoggerInterface|null
      */
-    private $_logger                            =   null;
+    protected $_logger                          =   null;
 
     /**
      * @var \Closure|null
      */
-    private $_format                            =   null;
+    protected $_format                          =   null;
 
     /**
      * @var \Closure|null
      */
-    private $_escape                            =   null;
+    protected $_escape                          =   null;
 
     /**
      * @var bool
      */
-    private $_escapeValue                       =   true;
+    protected $_escapeValue                     =   true;
 
     /**
      * @var bool
      */
-    private $_useRawValueToEscape               =   false;
+    protected $_useRawValueToEscape             =   false;
 
     /**
      * @var string
      */
-    private $_prefix                            =   '{{';
+    protected $_prefix                          =   '{{';
 
     /**
      * @var string
      */
-    private $_suffix                            =   '}}';
+    protected $_suffix                          =   '}}';
 
     /**
      * @var string
      */
-    private $_formatSeparator                   =   ',';
+    protected $_formatSeparator                 =   ',';
 
     /**
      * @var string
      */
-    private $_unescapePrefix                    =   '-';
+    protected $_unescapePrefix                  =   '-';
 
     /**
      * @var string
      */
-    private $_unescapeSuffix                    =   '';
+    protected $_unescapeSuffix                  =   '';
 
     /**
      * @var string|null
      */
-    private $_nestingPrefix                     =   null;
+    protected $_nestingPrefix                   =   null;
 
     /**
      * @var string|null
      */
-    private $_nestingSuffix                     =   null;
+    protected $_nestingSuffix                   =   null;
 
     /**
      * @var int
      */
-    private $_maxReplaces                       =   100;
+    protected $_maxReplaces                     =   100;
 
     /**
      * @var string
      */
-    private $_regexp                            =   '';
+    protected $_regexp                          =   '';
 
     /**
      * @var string
      */
-    private $_regexpUnescape                    =   '';
+    protected $_regexpUnescape                  =   '';
 
     /**
      * @var string
      */
-    private $_nestingRegexp                     =   '';
+    protected $_nestingRegexp                   =   '';
 
     /**
      * Interpolator constructor.

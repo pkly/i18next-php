@@ -11,19 +11,18 @@ namespace Pkly\I18Next\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Pkly\I18Next\I18n;
-use Pkly\I18Next\JsonLoader;
+use Pkly\I18Next\Plugin\JsonLoader;
 
 class JsonLoaderTest extends TestCase {
     public function testLoading() {
-        $jsonLoader = new JsonLoader();
-
         $i18n = new I18n([
             'lng'                   =>  'en',
-            'debug'                 =>  true,
-            'json_resource_path'    =>  __DIR__ . '/data/{{lng}}/{{ns}}.json'
+            'debug'                 =>  true
         ]);
 
-        $i18n->useModule($jsonLoader);
+        $i18n->useModule(new JsonLoader([
+            'json_resource_path'    =>  __DIR__ . '/data/{{lng}}/{{ns}}.json'
+        ]));
 
         $this->assertEquals('value from json!', $i18n->t('key'));
         $this->assertEquals('another json value', $i18n->t('second_key'));
