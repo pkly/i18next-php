@@ -114,16 +114,16 @@ class I18n {
     protected $_loader                          =   null;
 
     /**
-     * @var null|I18n
+     * @var null|$this
      */
     protected static $_instance                 =   null;
 
     /**
      * Return shared instance of the translation framework
      *
-     * @return I18n
+     * @return $this
      */
-    public static function &get(...$args): I18n {
+    public static function &get(...$args) {
         if (self::$_instance === null)
             self::$_instance = new static(...$args);
 
@@ -445,7 +445,7 @@ class I18n {
     /**
      * Overloaded clone operation
      *
-     * @return I18n
+     * @return $this
      */
     public function __clone() {
         $clone = clone $this;
