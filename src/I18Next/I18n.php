@@ -320,16 +320,22 @@ class I18n {
      * @param $ns
      * @return \Closure
      */
-    public function getFixedT($lng, $ns) {
+    public function getFixedT($lng, $ns = null) {
+        if ($ns === null)
+            $ns = $this->_options['ns'] ?? ['translation'];
+
+        if (!is_array($ns))
+            $ns = [$ns];
+
         $staticOptions = [
             'ns'                                    =>  $ns,
             (is_string($lng) ? 'lng' : 'lngs')      =>  $lng
         ];
 
-        return function ($key, $opts, ...$rest) use ($staticOptions) {
+        return function ($key, $opts = null, ...$rest) use ($staticOptions) {
             $options = [];
             if (!is_array($opts)) {
-                $options = call_user_func([$this->_options, 'overloadTranslationOptionHandler'], array_merge([$key, $opts], $rest));
+                $options = call_user_func($this->_options['overloadTranslationOptionHandler'], array_merge([$key, $opts], $rest));
             }
             else {
                 $options = $opts;

@@ -51,4 +51,37 @@ class BaseTest extends TestCase {
         $this->assertEquals('value', $i18n->t('key'));
         $this->assertEquals('value2', $i18n->t('deep.key'));
     }
+
+    /**
+     * @depends testNormalUsage
+     */
+    public function testFixedT() {
+        $i18n = new I18n([
+            'lng'           =>  'en',
+            'debug'         =>  true,
+            'resources'     =>  [
+                'en'        =>  [
+                    'translation'       =>  [
+                        'key'           =>  'value',
+                        'deep'          =>  [
+                            'key'       =>  'value2'
+                        ]
+                    ]
+                ],
+                'ru'        =>  [
+                    'translation'       =>  [
+                        'key'           =>  'val_ru',
+                        'deep'          =>  [
+                            'key'       =>  'val2_ru'
+                        ]
+                    ]
+                ]
+            ]
+        ]);
+
+        $this->assertEquals('value', $i18n->t('key'));
+        $fT = $i18n->getFixedT('ru');
+        $this->assertEquals('val_ru', $fT('key'));
+        $this->assertEquals('val2_ru', $fT('deep.key'));
+    }
 }
