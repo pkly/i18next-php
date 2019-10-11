@@ -27,7 +27,7 @@ class PostProcessor {
      * @param string $name
      * @param $object
      */
-    public function addPostProcessor(string $name, $object) {
+    public function addPostProcessor(string $name, PostProcessorInterface $object) {
         $this->_processors[$name] = $object;
     }
 

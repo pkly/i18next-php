@@ -8,11 +8,9 @@ use Pkly\I18Next\Plugin\JsonLoader;
 
 I18n::get([
     'lng'                   =>  'en'
-]);
-
-I18n::get()->useModule(new JsonLoader([
+])->useModule(new JsonLoader([
     'json_resource_path'    =>  __DIR__ . '/data/{{lng}}/{{ns}}.json'
-]));
+]))->init();
 
 echo "Reading 'key' from file - " . I18n::get()->t('key') . "\n";
 // Outputs "Translation from file"

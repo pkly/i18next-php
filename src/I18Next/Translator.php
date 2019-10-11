@@ -97,9 +97,9 @@ class Translator {
     /**
      * Change current language
      *
-     * @param string $lng
+     * @param null|string $lng
      */
-    public function changeLanguage(string $lng) {
+    public function changeLanguage(?string $lng) {
         if ($lng)
             $this->_language = $lng;
     }

@@ -22,7 +22,7 @@ class JsonLoaderTest extends TestCase {
 
         $i18n->useModule(new JsonLoader([
             'json_resource_path'    =>  __DIR__ . '/data/{{lng}}/{{ns}}.json'
-        ]));
+        ]))->init();
 
         $this->assertEquals('value from json!', $i18n->t('key'));
         $this->assertEquals('another json value', $i18n->t('second_key'));

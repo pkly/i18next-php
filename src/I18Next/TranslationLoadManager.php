@@ -64,14 +64,19 @@ class TranslationLoadManager {
      * @param BaseLoader|null $loader
      * @param ResourceStore $store
      * @param $services
+     * @param I18n $i18n
      * @param array $options
      */
-    public function __construct(?BaseLoader &$loader, ResourceStore &$store, &$services, array $options = []) {
+    public function __construct(?BaseLoader &$loader, ResourceStore &$store, &$services, I18n &$i18n, array $options = []) {
         $this->_loader = &$loader;
         $this->_store = &$store;
         $this->_options = $options;
         $this->_languageUtils = &$services->_languageUtils;
         $this->_logger = &$services->_logger;
+
+        if ($this->_loader !== null) {
+            $this->_loader->init($services, $options, $i18n);
+        }
     }
 
     /**

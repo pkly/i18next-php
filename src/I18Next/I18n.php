@@ -8,6 +8,7 @@
 
 namespace Pkly\I18Next;
 
+use Pkly\I18Next\Plugin\BaseLanguageDetector;
 use Pkly\I18Next\Plugin\BaseLoader;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -173,11 +174,12 @@ class I18n {
             ], $this->_logger);
             $this->_services->_interpolator = new Interpolator($this->_options, $this->_logger);
 
-            $this->_translationLoadManager = new TranslationLoadManager($this->_loader, $this->_store, $this->_services, $this->_options);
+            $this->_translationLoadManager = new TranslationLoadManager($this->_loader, $this->_store, $this->_services, $this, $this->_options);
             $this->_services->_translationLoadManager = &$this->_translationLoadManager;
 
             if (isset($this->_modules['languageDetector'])) {
                 $this->_modules['languageDetector']->init($this->_services, $this->_options, $this);
+                $this->_services->_languageDetector = &$this->_modules['languageDetector'];
             }
 
             $this->_translator = new Translator($this->_services, $this->_options);
@@ -254,7 +256,7 @@ class I18n {
      * @return $this
      */
     public function useModule(ModuleInterface $module) {
-        if ($module->getModuleType() === MODULE_TYPE_LANGUAGE_DETECTOR) {
+        if ($module->getModuleType() === MODULE_TYPE_LANGUAGE_DETECTOR && $module instanceof BaseLanguageDetector) {
             $this->_modules['languageDetector'] = $module;
         }
 
@@ -272,12 +274,6 @@ class I18n {
 
         if ($module->getModuleType() === MODULE_TYPE_LOADER) {
             $this->_loader = $module;
-            $this->_loader->init($this->_services, $this->_options, $this);
-
-            if ($this->_translationLoadManager !== null)
-                $this->_translationLoadManager->setLoader($this->_loader);
-
-            $this->loadResources();
         }
 
         return $this;
@@ -297,7 +293,8 @@ class I18n {
                 if (!$this->_translator->getLanguage())
                     $this->_translator->changeLanguage($l);
 
-                // TODO: Language detector, cache user language
+                if (isset($this->_services->_languageDetector))
+                    $this->_services->_languageDetector->cacheUserLanguage($l);
             }
 
             $this->loadResources();
@@ -333,7 +330,6 @@ class I18n {
         ];
 
         return function ($key, $opts = null, ...$rest) use ($staticOptions) {
-            $options = [];
             if (!is_array($opts)) {
                 $options = call_user_func($this->_options['overloadTranslationOptionHandler'], array_merge([$key, $opts], $rest));
             }
