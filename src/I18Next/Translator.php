@@ -420,7 +420,7 @@ class Translator {
 
                         // get key for context if needed
                         if ($needsContextHandling)
-                            $finalKeys[] = $finalKey .= $this->_options['contextSeparator'] ?? '' . $options['context'];
+                            $finalKeys[] = $finalKey .= ($this->_options['contextSeparator'] ?? '') . $options['context'];
 
                         // get key for plural if needed
                         if ($needsPluralHandling)
