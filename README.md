@@ -49,7 +49,7 @@ $i18n = new I18n([
 
 $i18n->t('key'); // "Value"
 $i18n->t('key', ['count' => 5]); // "Value plural"
-$i18n->t('deeper.key'); // "Depp value"
+$i18n->t('deeper.key'); // "Deep value"
 ```
 
 ### Composer
