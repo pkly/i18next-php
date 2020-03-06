@@ -146,73 +146,74 @@ const SETS = [
  *
  * @return array
  */
-function getRulesForPluralTypes(): array {
+function getRulesForPluralTypes(): array
+{
     return [
-        1   =>  function($n) {
+        1 => function ($n) {
             return (int)($n > 1);
         },
-        2   =>  function($n) {
+        2 => function ($n) {
             return (int)($n !== 1);
         },
-        3   =>  function($n) {
+        3 => function ($n) {
             return 0;
         },
-        4   =>  function($n) {
-            return (int)($n%10==1 && $n%100!=11 ? 0 : $n%10>=2 && $n%10<=4 && ($n%100<10 || $n%100>=20) ? 1 : 2);
+        4 => function ($n) {
+            return (int)(($n % 10 == 1 && $n % 100 != 11 ? 0 : $n % 10 >= 2 && $n % 10 <= 4 && ($n % 100 < 10 || $n % 100 >= 20)) ? 1 : 2);
         },
-        5   =>  function($n) {
-            return (int)($n===0 ? 0 : $n==1 ? 1 : $n==2 ? 2 : $n%100>=3 && $n%100<=10 ? 3 : $n%100>=11 ? 4 : 5);
+        5 => function ($n) {
+            return (int)((((($n === 0 ? 0 : $n == 1) ? 1 : $n == 2) ? 2 : $n % 100 >= 3 && $n % 100 <= 10) ? 3 : $n % 100 >= 11) ? 4 : 5);
         },
-        6   =>  function($n) {
-            return (int)(($n==1) ? 0 : ($n>=2 && $n<=4) ? 1 : 2);
+        6 => function ($n) {
+            return (int)((($n == 1) ? 0 : ($n >= 2 && $n <= 4)) ? 1 : 2);
         },
-        7   =>  function($n) {
-            return (int)($n==1 ? 0 : $n%10>=2 && $n%10<=4 && ($n%100<10 || $n%100>=20) ? 1 : 2);
+        7 => function ($n) {
+            return (int)(($n == 1 ? 0 : $n % 10 >= 2 && $n % 10 <= 4 && ($n % 100 < 10 || $n % 100 >= 20)) ? 1 : 2);
         },
-        8   =>  function($n) {
-            return (int)(($n==1) ? 0 : ($n==2) ? 1 : ($n != 8 && $n != 11) ? 2 : 3);
+        8 => function ($n) {
+            return (int)(((($n == 1) ? 0 : ($n == 2)) ? 1 : ($n != 8 && $n != 11)) ? 2 : 3);
         },
-        9   =>  function($n) {
+        9 => function ($n) {
             return (int)($n >= 2);
         },
-        10  =>  function($n) {
-            return (int)($n==1 ? 0 : $n==2 ? 1 : $n<7 ? 2 : $n<11 ? 3 : 4);
+        10 => function ($n) {
+            return (int)(((($n == 1 ? 0 : $n == 2) ? 1 : $n < 7) ? 2 : $n < 11) ? 3 : 4);
         },
-        11  =>  function($n) {
-            return (int)(($n==1 || $n==11) ? 0 : ($n==2 || $n==12) ? 1 : ($n > 2 && $n < 20) ? 2 : 3);
+        11 => function ($n) {
+            return (int)(((($n == 1 || $n == 11) ? 0 : ($n == 2 || $n == 12)) ? 1 : ($n > 2 && $n < 20)) ? 2 : 3);
         },
-        12  =>  function($n) {
-            return (int)($n%10!=1 || $n%100==11);
+        12 => function ($n) {
+            return (int)($n % 10 != 1 || $n % 100 == 11);
         },
-        13  =>  function($n) {
+        13 => function ($n) {
             return (int)($n !== 0);
         },
-        14  =>  function($n) {
-            return (int)(($n==1) ? 0 : ($n==2) ? 1 : ($n == 3) ? 2 : 3);
+        14 => function ($n) {
+            return (int)(((($n == 1) ? 0 : ($n == 2)) ? 1 : ($n == 3)) ? 2 : 3);
         },
-        15  =>  function($n) {
-            return (int)($n%10==1 && $n%100!=11 ? 0 : $n%10>=2 && ($n%100<10 || $n%100>=20) ? 1 : 2);
+        15 => function ($n) {
+            return (int)(($n % 10 == 1 && $n % 100 != 11 ? 0 : $n % 10 >= 2 && ($n % 100 < 10 || $n % 100 >= 20)) ? 1 : 2);
         },
-        16  =>  function($n) {
-            return (int)($n%10==1 && $n%100!=11 ? 0 : $n !== 0 ? 1 : 2);
+        16 => function ($n) {
+            return (int)(($n % 10 == 1 && $n % 100 != 11 ? 0 : $n !== 0) ? 1 : 2);
         },
-        17  =>  function($n) {
-            return (int)($n==1 || $n%10==1 ? 0 : 1);
+        17 => function ($n) {
+            return (int)($n == 1 || $n % 10 == 1 ? 0 : 1);
         },
-        18  =>  function($n) {
-            return (int)($n==0 ? 0 : $n==1 ? 1 : 2);
+        18 => function ($n) {
+            return (int)(($n == 0 ? 0 : $n == 1) ? 1 : 2);
         },
-        19  =>  function($n) {
-            return (int)($n==1 ? 0 : $n===0 || ( $n%100>1 && $n%100<11) ? 1 : ($n%100>10 && $n%100<20 ) ? 2 : 3);
+        19 => function ($n) {
+            return (int)((($n == 1 ? 0 : $n === 0 || ($n % 100 > 1 && $n % 100 < 11)) ? 1 : ($n % 100 > 10 && $n % 100 < 20)) ? 2 : 3);
         },
-        20  =>  function($n) {
-            return (int)($n==1 ? 0 : ($n===0 || ($n%100 > 0 && $n%100 < 20)) ? 1 : 2);
+        20 => function ($n) {
+            return (int)(($n == 1 ? 0 : ($n === 0 || ($n % 100 > 0 && $n % 100 < 20))) ? 1 : 2);
         },
-        21  =>  function($n) {
-            return (int)($n%100==1 ? 1 : $n%100==2 ? 2 : $n%100==3 || $n%100==4 ? 3 : 0);
+        21 => function ($n) {
+            return (int)((($n % 100 == 1 ? 1 : $n % 100 == 2) ? 2 : $n % 100 == 3 || $n % 100 == 4) ? 3 : 0);
         },
-        22  =>  function($n) {
-            return (int)($n===1 ? 0 : $n===2 ? 1 : ($n<0 || $n>10) && $n%10==0 ? 2 : 3);
+        22 => function ($n) {
+            return (int)((($n === 1 ? 0 : $n === 2) ? 1 : ($n < 0 || $n > 10) && $n % 10 == 0) ? 2 : 3);
         }
     ];
 }
