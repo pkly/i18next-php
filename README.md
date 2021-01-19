@@ -1,5 +1,9 @@
 # i18next-php
 
+<p align="center">
+    <img src="https://github.com/pkly/i18next-php/workflows/Tests/badge.svg">
+</p>
+
 A port of [i18next](https://www.i18next.com/) in PHP. With a rest API. (coming soon \[tm\])
 
 Code in this repository is largely based on the original code base in JavaScript, rewritten in PHP.
