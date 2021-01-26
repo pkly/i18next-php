@@ -44,7 +44,7 @@ class Cookie implements DetectorInterface {
         $cookieName = $options['lookupCookie'] ?? null;
 
         if ($cookieName) {
-            $minutes = ($options['cookieMinutes'] ?? (60 * 24)) * 60;
+            $minutes = ($options['cookieMinutes'] ?? (60 * 24)) * 60 + time();
             $domain = $options['cookieDomain'] ?? '';
             setcookie($cookieName, $lng, $minutes, '/', $domain);
         }
