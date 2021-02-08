@@ -278,8 +278,9 @@ class Translator {
                     $lngs[] = $options['lng'] ?? $this->_language;
 
                 $send = function($l, $k) use ($namespace, $updateMissing, $options, $res) {
-                    if (isset($this->_options['missingKeyHandler']) && is_callable([$this->_options, 'missingKeyHandler'])) {
-                        call_user_func([$this->_options, 'missingKeyHandler'], $l, $namespace, $k, $updateMissing ? $options['defaultValue'] ?? null : $res, $updateMissing, $options);
+                    if (isset($this->_options['missingKeyHandler']) && is_callable($this->_options['missingKeyHandler'])) {
+                        call_user_func($this->_options['missingKeyHandler'], $l, $namespace, $k, $updateMissing ? $options['defaultValue'] ?? null : $res,
+                            $updateMissing, $options);
                     }
                     else if ($this->_translationLoadManager !== null) {
                         $this->_translationLoadManager->saveMissing($l, $namespace, $k, $updateMissing ? $options['defaultValue'] ?? null : $res, $updateMissing, $options);
