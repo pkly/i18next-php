@@ -1,8 +1,6 @@
 # i18next-php
 
-<p align="center">
-    <img src="https://github.com/pkly/i18next-php/workflows/Tests/badge.svg">
-</p>
+<img src="https://github.com/pkly/i18next-php/workflows/Tests/badge.svg">
 
 A port of [i18next](https://www.i18next.com/) in PHP. With a rest API. (coming soon \[tm\])
 
