@@ -67,7 +67,7 @@ class TranslationLoadManager {
      * @param I18n $i18n
      * @param array $options
      */
-    public function __construct(?BaseLoader &$loader, ResourceStore &$store, &$services, I18n &$i18n, array $options = []) {
+    public function __construct(?Plugin\BaseLoader &$loader, ResourceStore &$store, &$services, I18n &$i18n, array $options = []) {
         $this->_loader = &$loader;
         $this->_store = &$store;
         $this->_options = $options;
