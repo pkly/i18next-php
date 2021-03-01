@@ -70,6 +70,33 @@ class JsonLoader extends BaseLoader {
     /**
      * @inheritDoc
      */
+
+         public function create($languages, $namespace, $key, $fallbackValue, array $options = [], $isUpdate = false)
+    {
+        $interpolator = &$this->_services->_interpolator;
+        $path = $interpolator->interpolate($this->_filePath, [
+            'lng' => $languages[0],
+            'ns' => $namespace
+        ]);
+
+        if (! file_exists($path)) {
+            file_put_contents($path, "{}");
+        }
+
+        $content = file_get_contents($path);
+        $decoded = json_decode($content);
+        $decoded->{$key} = $fallbackValue;
+
+        $ret = file_put_contents($path, json_encode($decoded), LOCK_EX);
+
+        return $ret !== false && $ret > 0;
+    }
+
+
+
+    /**
+     * @inheritDoc
+     */
     public function read($language, $namespace) {
         /**
          * @var Interpolator $interpolator
