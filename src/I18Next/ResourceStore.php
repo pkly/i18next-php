@@ -104,7 +104,7 @@ class ResourceStore implements \JsonSerializable {
             $path = array_merge($path, $key);
 
         if ($key && is_string($key))
-            $path = array_merge($path, ($keySeparator ? explode($keySeparator, $key) : $key));
+            $path = array_merge($path, ($keySeparator ? explode($keySeparator, $key) : [$key]));
 
         if (mb_strpos($lng, '.') !== false) {
             $path = explode($lng, '.');
@@ -128,7 +128,7 @@ class ResourceStore implements \JsonSerializable {
         $path = [$lng, $ns];
 
         if ($key)
-            $path = array_merge($path, ($keySeparator ? explode($keySeparator, $key) : $key));
+            $path = array_merge($path, ($keySeparator ? explode($keySeparator, $key) : [$key]));
 
         if (mb_strpos($lng, '.') !== false) {
             $path = explode('.', $lng);
