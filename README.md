@@ -2,15 +2,17 @@
 
 <img src="https://github.com/pkly/i18next-php/workflows/Tests/badge.svg">
 
-A port of [i18next](https://www.i18next.com/) in PHP. With a rest API. (coming soon \[tm\])
+A port of [i18next](https://www.i18next.com/) in PHP.
 
 Code in this repository is largely based on the original code base in JavaScript, rewritten in PHP.
 This project focuses only on the newest version of i18next, disregarding compatibility with previous ones.
 
-### Warning!
+## This repository is in read-only mode and no new releases will be made
 
-This version is usable, but could contain bugs. 
-If you find any issues please report them or create a PR.
+As my knowledge of php grew so did my distaste for this project. While not terrible by any means it's just a port and as such there's no beauty in it. It saddens me to have written something so dull and as such I urge you to seek a replacement in [Symfony's delicious translator package](https://symfony.com/doc/current/translation.html) as it's simply a better alternative for a PHP solution.
+If you wish to use it or fork it you have my blessing. 
+
+I have no plans to take down the packagist package so feel free to install it if you so desire.
 
 ### Features
 
